@@ -42,25 +42,5 @@
       "icons/icon.ico"
     ]
   },
-  "plugins": {
-    "shell": {
-      "open": true,
-      "scope": [
-        {
-          "name": "claude",
-          "cmd": "claude",
-          "args": true
-        }
-      ]
-    },
-    "fs": {
-      "scope": ["**"]
-    },
-    "notification": {
-      "all": true
-    },
-    "global-shortcut": {
-      "all": true
-    }
-  }
+  "plugins": {}
 }
