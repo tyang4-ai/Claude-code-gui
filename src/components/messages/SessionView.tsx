@@ -112,6 +112,17 @@ export function SessionView({ session }: SessionViewProps) {
     }
   }, [session.working_dir]);
 
+  // Handle interrupt/stop
+  const handleInterrupt = useCallback(async () => {
+    try {
+      const cliBridge = getCLIBridge();
+      await cliBridge.sendInterrupt(session.id);
+      updateSessionStatus(session.id, "idle");
+    } catch (error) {
+      console.error("Failed to interrupt session:", error);
+    }
+  }, [session.id, updateSessionStatus]);
+
   const handleSubmit = useCallback(async (prompt: string) => {
     const cliBridge = getCLIBridge();
     const skillsManager = getSkillsManager();
@@ -155,12 +166,20 @@ export function SessionView({ session }: SessionViewProps) {
   }, [session.id, session.working_dir, appendToTranscript, updateSessionStatus]);
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Skills activation indicator */}
       {activatedSkills.length > 0 && (
-        <div className="px-4 py-2 bg-accent-primary/10 border-b border-default flex items-center gap-2 text-sm">
-          <span className="text-accent-primary">⚡</span>
-          <span className="text-primary">
+        <div style={{
+          padding: '8px 16px',
+          backgroundColor: 'rgba(42, 157, 143, 0.1)',
+          borderBottom: '1px solid #2a4a5a',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontSize: '14px'
+        }}>
+          <span style={{ color: '#2a9d8f' }}>&#9889;</span>
+          <span style={{ color: '#e8e8e8' }}>
             Auto-activated: {activatedSkills.join(", ")}
           </span>
         </div>
@@ -173,17 +192,68 @@ export function SessionView({ session }: SessionViewProps) {
         pendingEdits={session.pendingEdits}
       />
 
-      {/* Input Area */}
-      <InputArea
-        onSubmit={handleSubmit}
-        disabled={session.status === "thinking"}
-        workingDir={session.working_dir}
-        placeholder={
-          session.status === "thinking"
-            ? "Claude is thinking..."
-            : "Type a message... (Ctrl+Enter to send)"
-        }
-      />
+      {/* Input Area with Stop button */}
+      <div style={{ position: 'relative' }}>
+        {/* Stop button - only show when thinking */}
+        {session.status === "thinking" && (
+          <div style={{
+            position: 'absolute',
+            top: '-44px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10
+          }}>
+            <button
+              onClick={handleInterrupt}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                backgroundColor: '#e76f51',
+                border: 'none',
+                borderRadius: '6px',
+                color: '#ffffff',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#d45d41';
+                e.currentTarget.style.transform = 'scale(1.02)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#e76f51';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              {/* Stop icon */}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+              </svg>
+              Stop
+            </button>
+          </div>
+        )}
+
+        <InputArea
+          onSubmit={handleSubmit}
+          disabled={session.status === "thinking"}
+          workingDir={session.working_dir}
+          placeholder={
+            session.status === "thinking"
+              ? "Claude is thinking..."
+              : "Type a message... (Ctrl+Enter to send)"
+          }
+        />
+      </div>
     </div>
   );
 }

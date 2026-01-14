@@ -10,6 +10,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { getFileIndex } from "../../core/file-index";
+import { useStore } from "../../core/store";
 
 interface FileEntry {
   path: string;
@@ -37,6 +38,10 @@ export function InputArea({
   const [autocompleteResults, setAutocompleteResults] = useState<FileEntry[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const promptHistory = useStore((state) => state.promptHistory);
+  const addPromptHistory = useStore((state) => state.addPromptHistory);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const autocompleteRef = useRef<HTMLDivElement>(null);
@@ -111,6 +116,8 @@ export function InputArea({
 
       setValue(newValue);
       setCursorPosition(newCursorPos);
+      // Reset history navigation when user types
+      setHistoryIndex(-1);
 
       // Check for @ trigger
       const trigger = findAtTrigger(newValue, newCursorPos);
@@ -155,11 +162,13 @@ export function InputArea({
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
     if (trimmed && !disabled) {
+      addPromptHistory(trimmed);
       onSubmit(trimmed);
       setValue("");
       setShowAutocomplete(false);
+      setHistoryIndex(-1);
     }
-  }, [value, disabled, onSubmit]);
+  }, [value, disabled, onSubmit, addPromptHistory]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -196,13 +205,29 @@ export function InputArea({
         }
       }
 
+      // History navigation - when input is empty and no autocomplete showing
+      if (e.key === "ArrowUp" && value === "" && !showAutocomplete && promptHistory.length > 0) {
+        e.preventDefault();
+        const newIndex = Math.min(historyIndex + 1, promptHistory.length - 1);
+        setHistoryIndex(newIndex);
+        setValue(promptHistory[newIndex] || "");
+        return;
+      }
+      if (e.key === "ArrowDown" && historyIndex >= 0 && !showAutocomplete) {
+        e.preventDefault();
+        const newIndex = historyIndex - 1;
+        setHistoryIndex(newIndex);
+        setValue(newIndex >= 0 ? promptHistory[newIndex] : "");
+        return;
+      }
+
       // Submit on Ctrl+Enter
       if (e.key === "Enter" && e.ctrlKey) {
         e.preventDefault();
         handleSubmit();
       }
     },
-    [showAutocomplete, autocompleteResults, selectedIndex, handleSelectFile, handleSubmit]
+    [showAutocomplete, autocompleteResults, selectedIndex, handleSelectFile, handleSubmit, value, promptHistory, historyIndex]
   );
 
   // Auto-resize textarea
@@ -232,10 +257,14 @@ export function InputArea({
   }, []);
 
   return (
-    <div className="border-t border-default bg-secondary p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-end gap-3">
-          <div className="flex-1 relative">
+    <div style={{
+      borderTop: '1px solid var(--color-border-muted)',
+      backgroundColor: 'var(--color-bg-surface)',
+      padding: '16px'
+    }}>
+      <div style={{ maxWidth: '56rem', margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+          <div style={{ flex: 1, position: 'relative' }}>
             <textarea
               ref={textareaRef}
               value={value}
@@ -246,14 +275,32 @@ export function InputArea({
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               disabled={disabled}
-              className={`
-                w-full px-4 py-3 rounded-lg resize-none
-                bg-primary border border-default
-                text-primary placeholder-muted
-                focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent
-                disabled:opacity-50 disabled:cursor-not-allowed
-                min-h-[48px] max-h-[200px]
-              `}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-md)',
+                resize: 'none',
+                backgroundColor: 'var(--color-bg-base)',
+                border: '1px solid var(--color-border-default)',
+                color: 'var(--color-text-primary)',
+                fontSize: 'var(--text-base)',
+                minHeight: '48px',
+                maxHeight: '200px',
+                outline: 'none',
+                boxShadow: 'var(--shadow-inset)',
+                boxSizing: 'border-box',
+                transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)',
+                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? 'not-allowed' : 'text'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--color-accent)';
+                e.target.style.boxShadow = 'var(--shadow-glow)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--color-border-default)';
+                e.target.style.boxShadow = 'var(--shadow-inset)';
+              }}
               rows={1}
               data-testid="prompt-input"
             />
@@ -262,22 +309,42 @@ export function InputArea({
             {showAutocomplete && autocompleteResults.length > 0 && (
               <div
                 ref={autocompleteRef}
-                className="absolute bottom-full left-0 right-0 mb-1 bg-primary border border-default rounded-lg shadow-lg overflow-hidden z-10"
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: 0,
+                  right: 0,
+                  marginBottom: '4px',
+                  backgroundColor: 'var(--color-bg-elevated)',
+                  border: '1px solid var(--color-border-default)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-lg)',
+                  overflow: 'hidden',
+                  zIndex: 10
+                }}
                 data-testid="autocomplete-dropdown"
               >
-                <div className="max-h-64 overflow-auto">
+                <div style={{ maxHeight: '256px', overflowY: 'auto' }}>
                   {autocompleteResults.map((file, index) => (
                     <button
                       key={file.path}
-                      className={`
-                        w-full px-3 py-2 text-left flex items-center gap-2 transition-colors
-                        ${index === selectedIndex ? "bg-accent-primary/20" : "hover:bg-tertiary"}
-                      `}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        backgroundColor: index === selectedIndex ? 'var(--color-bg-overlay)' : 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background-color var(--transition-fast)'
+                      }}
                       onClick={() => handleSelectFile(file)}
                       onMouseEnter={() => setSelectedIndex(index)}
                     >
                       <svg
-                        className="w-4 h-4 text-secondary flex-shrink-0"
+                        style={{ width: '16px', height: '16px', color: 'var(--color-text-secondary)', flexShrink: 0 }}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -289,26 +356,26 @@ export function InputArea({
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                         />
                       </svg>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--color-text-primary)' }}>
                           {file.name}
                         </div>
-                        <div className="text-xs text-secondary truncate">
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {file.relativePath}
                         </div>
                       </div>
                     </button>
                   ))}
                 </div>
-                <div className="px-3 py-1.5 bg-tertiary text-xs text-secondary flex items-center justify-between">
+                <div style={{ padding: '6px 12px', backgroundColor: 'var(--color-bg-overlay)', fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>
-                    <kbd className="px-1 py-0.5 bg-primary rounded text-xs">Tab</kbd>{" "}
+                    <kbd style={{ padding: '2px 4px', backgroundColor: 'var(--color-bg-base)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)' }}>Tab</kbd>{" "}
                     or{" "}
-                    <kbd className="px-1 py-0.5 bg-primary rounded text-xs">Enter</kbd>{" "}
+                    <kbd style={{ padding: '2px 4px', backgroundColor: 'var(--color-bg-base)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)' }}>Enter</kbd>{" "}
                     to select
                   </span>
                   <span>
-                    <kbd className="px-1 py-0.5 bg-primary rounded text-xs">Esc</kbd>{" "}
+                    <kbd style={{ padding: '2px 4px', backgroundColor: 'var(--color-bg-base)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)' }}>Esc</kbd>{" "}
                     to close
                   </span>
                 </div>
@@ -319,7 +386,20 @@ export function InputArea({
             {showAutocomplete && autocompleteQuery && autocompleteResults.length === 0 && (
               <div
                 ref={autocompleteRef}
-                className="absolute bottom-full left-0 right-0 mb-1 bg-primary border border-default rounded-lg shadow-lg p-3 text-sm text-secondary"
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: 0,
+                  right: 0,
+                  marginBottom: '4px',
+                  backgroundColor: 'var(--color-bg-elevated)',
+                  border: '1px solid var(--color-border-default)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-lg)',
+                  padding: '12px',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--color-text-secondary)'
+                }}
               >
                 No files matching "{autocompleteQuery}"
               </div>
@@ -329,19 +409,23 @@ export function InputArea({
           <button
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
-            className={`
-              p-3 rounded-lg transition-colors
-              ${
-                disabled || !value.trim()
-                  ? "bg-tertiary text-muted cursor-not-allowed"
-                  : "bg-accent-primary text-white hover:bg-accent-primary/80"
-              }
-            `}
+            style={{
+              padding: '12px',
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              background: disabled || !value.trim()
+                ? 'var(--color-bg-overlay)'
+                : 'linear-gradient(135deg, var(--color-accent) 0%, #388bfd 100%)',
+              color: disabled || !value.trim() ? 'var(--color-text-muted)' : 'white',
+              cursor: disabled || !value.trim() ? 'not-allowed' : 'pointer',
+              boxShadow: disabled || !value.trim() ? 'none' : 'var(--shadow-sm)',
+              transition: 'all var(--transition-fast)'
+            }}
             aria-label="Send message"
             data-testid="send-button"
           >
             <svg
-              className="w-5 h-5"
+              style={{ width: '20px', height: '20px' }}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -357,11 +441,11 @@ export function InputArea({
         </div>
 
         {/* Keyboard shortcut hint */}
-        <div className="mt-2 text-xs text-muted text-right">
+        <div style={{ marginTop: '8px', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textAlign: 'right' }}>
           Press{" "}
-          <kbd className="px-1.5 py-0.5 bg-tertiary rounded">Ctrl+Enter</kbd>{" "}
+          <kbd style={{ padding: '2px 6px', backgroundColor: 'var(--color-bg-overlay)', borderRadius: 'var(--radius-sm)' }}>Ctrl+Enter</kbd>{" "}
           to send | Type{" "}
-          <kbd className="px-1.5 py-0.5 bg-tertiary rounded">@</kbd>{" "}
+          <kbd style={{ padding: '2px 6px', backgroundColor: 'var(--color-bg-overlay)', borderRadius: 'var(--radius-sm)' }}>@</kbd>{" "}
           for file autocomplete
         </div>
       </div>

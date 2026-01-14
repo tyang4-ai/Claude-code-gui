@@ -120,6 +120,8 @@ pub fn run() {
             commands::files::apply_edit,
             commands::files::list_files,
             commands::files::file_exists,
+            commands::files::ensure_dir,
+            commands::files::delete_file,
             commands::files::get_file_metadata,
             // System commands
             commands::system::get_app_data_dir,
@@ -130,6 +132,16 @@ pub fn run() {
             commands::system::git_staged,
             commands::system::open_in_vscode,
             commands::system::open_diff_in_vscode,
+            // MCP commands
+            commands::mcp::read_mcp_config,
+            commands::mcp::write_mcp_config,
+            commands::mcp::mcp_config_exists,
+            commands::mcp::get_mcp_config_paths,
+            commands::mcp::start_mcp_server,
+            commands::mcp::stop_mcp_server,
+            commands::mcp::is_process_running,
+            commands::mcp::health_check_mcp_server,
+            commands::mcp::fetch_mcp_capabilities,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

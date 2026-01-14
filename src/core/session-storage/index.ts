@@ -5,8 +5,13 @@
  * Sessions are stored in ~/.claude-companion/sessions/
  */
 
-import { invoke } from "@tauri-apps/api/core";
 import type { Session, TranscriptEntry } from "../types";
+
+// Helper to dynamically import invoke
+async function invokeCmd<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<T>(cmd, args);
+}
 
 // Persisted session format (what we save to disk)
 interface PersistedSession {
@@ -19,6 +24,8 @@ interface PersistedSession {
   prompt_count: number;
   total_cost_usd: number;
   transcript: TranscriptEntry[];
+  displayName?: string; // Custom user-defined name for the session
+  cleanShutdown?: boolean; // false = potential crash, true = clean exit
 }
 
 // Singleton instance
@@ -44,23 +51,28 @@ export class SessionStorage {
 
     try {
       const homeDir = await this.getHomeDir();
-      this.sessionsDir = `${homeDir}/.claude-companion/sessions`;
+      if (homeDir) {
+        this.sessionsDir = `${homeDir}/.claude-companion/sessions`;
+      } else {
+        this.sessionsDir = "./.claude-companion/sessions";
+      }
 
       // Ensure directory exists
-      await invoke("ensure_dir", { path: this.sessionsDir }).catch(() => {
-        // Command might not exist, try alternative
-        console.debug("ensure_dir not available, sessions will be created on first save");
-      });
+      try {
+        await invokeCmd("ensure_dir", { path: this.sessionsDir });
+      } catch (e) {
+        console.debug("ensure_dir failed, will create on first save:", e);
+      }
     } catch (error) {
       console.error("Failed to initialize session storage:", error);
-      // Fallback to temp directory
-      this.sessionsDir = "./sessions";
+      // Fallback to local directory
+      this.sessionsDir = "./.claude-companion/sessions";
     }
   }
 
   private async getHomeDir(): Promise<string> {
     try {
-      return await invoke<string>("get_home_dir");
+      return await invokeCmd<string>("get_home_dir");
     } catch {
       // Fallback - use Tauri API to get home directory
       return "";
@@ -69,6 +81,8 @@ export class SessionStorage {
 
   /**
    * Save a session to disk
+   * Note: cleanShutdown is set to false on every save; call markCleanShutdown()
+   * on clean exit to mark it as cleanly shut down.
    */
   async saveSession(session: Session): Promise<void> {
     if (!this.sessionsDir) {
@@ -85,13 +99,15 @@ export class SessionStorage {
       prompt_count: session.prompt_count,
       total_cost_usd: session.total_cost_usd,
       transcript: session.transcript,
+      displayName: session.displayName,
+      cleanShutdown: false, // Always save as potentially unclean
     };
 
     const path = `${this.sessionsDir}/${session.id}.json`;
     const content = JSON.stringify(persisted, null, 2);
 
     try {
-      await invoke("write_file_atomic", { path, content });
+      await invokeCmd("write_file_atomic", { path, content });
     } catch (error) {
       console.error(`Failed to save session ${session.id}:`, error);
     }
@@ -127,7 +143,7 @@ export class SessionStorage {
     const path = `${this.sessionsDir}/${sessionId}.json`;
 
     try {
-      const content = await invoke<string>("read_file", { path });
+      const content = await invokeCmd<string>("read_file", { path });
       const persisted: PersistedSession = JSON.parse(content);
 
       return {
@@ -141,6 +157,7 @@ export class SessionStorage {
         total_cost_usd: persisted.total_cost_usd || 0,
         transcript: persisted.transcript,
         pendingEdits: [],
+        displayName: persisted.displayName,
       };
     } catch (error) {
       console.warn(`Failed to load session ${sessionId}:`, error);
@@ -159,14 +176,14 @@ export class SessionStorage {
     const sessions: Session[] = [];
 
     try {
-      const files = await invoke<string[]>("list_files", {
+      const files = await invokeCmd<string[]>("list_files", {
         path: this.sessionsDir,
         pattern: "*.json",
       });
 
       for (const file of files) {
         try {
-          const content = await invoke<string>("read_file", { path: file });
+          const content = await invokeCmd<string>("read_file", { path: file });
           const persisted: PersistedSession = JSON.parse(content);
 
           sessions.push({
@@ -180,6 +197,7 @@ export class SessionStorage {
             total_cost_usd: persisted.total_cost_usd || 0,
             transcript: persisted.transcript,
             pendingEdits: [],
+            displayName: persisted.displayName,
           });
         } catch (error) {
           console.warn(`Failed to load session from ${file}:`, error);
@@ -213,7 +231,7 @@ export class SessionStorage {
     const path = `${this.sessionsDir}/${sessionId}.json`;
 
     try {
-      await invoke("delete_file", { path });
+      await invokeCmd("delete_file", { path });
     } catch (error) {
       console.warn(`Failed to delete session ${sessionId}:`, error);
     }
@@ -228,7 +246,7 @@ export class SessionStorage {
     }
 
     try {
-      const files = await invoke<string[]>("list_files", {
+      const files = await invokeCmd<string[]>("list_files", {
         path: this.sessionsDir,
         pattern: "*.json",
       });
@@ -265,6 +283,89 @@ export class SessionStorage {
    */
   setDebounceTime(ms: number): void {
     this.saveDebounceMs = ms;
+  }
+
+  /**
+   * Mark a session as cleanly shut down
+   * Call this on clean application exit for all active sessions
+   */
+  async markCleanShutdown(sessionId: string): Promise<void> {
+    if (!this.sessionsDir) {
+      await this.initialize();
+    }
+
+    const path = `${this.sessionsDir}/${sessionId}.json`;
+
+    try {
+      const content = await invokeCmd<string>("read_file", { path });
+      const persisted: PersistedSession = JSON.parse(content);
+      persisted.cleanShutdown = true;
+
+      const updatedContent = JSON.stringify(persisted, null, 2);
+      await invokeCmd("write_file_atomic", { path, content: updatedContent });
+    } catch (error) {
+      console.warn(`Failed to mark session ${sessionId} as clean shutdown:`, error);
+    }
+  }
+
+  /**
+   * Mark all persisted sessions as cleanly shut down
+   */
+  async markAllCleanShutdown(): Promise<void> {
+    const sessionIds = await this.getSessionIds();
+    await Promise.all(sessionIds.map(id => this.markCleanShutdown(id)));
+  }
+
+  /**
+   * Detect sessions that were not cleanly shut down (potential crash recovery)
+   * Returns sessions where cleanShutdown is false or undefined
+   */
+  async detectCrashedSessions(): Promise<Session[]> {
+    if (!this.sessionsDir) {
+      await this.initialize();
+    }
+
+    const crashedSessions: Session[] = [];
+
+    try {
+      const files = await invokeCmd<string[]>("list_files", {
+        path: this.sessionsDir,
+        pattern: "*.json",
+      });
+
+      for (const file of files) {
+        try {
+          const content = await invokeCmd<string>("read_file", { path: file });
+          const persisted: PersistedSession = JSON.parse(content);
+
+          // Check if session was not cleanly shut down
+          if (!persisted.cleanShutdown) {
+            crashedSessions.push({
+              id: persisted.id,
+              claude_session_id: persisted.claude_session_id,
+              working_dir: persisted.working_dir,
+              model: persisted.model,
+              created_at: persisted.created_at,
+              status: "idle",
+              prompt_count: persisted.prompt_count || 0,
+              total_cost_usd: persisted.total_cost_usd || 0,
+              transcript: persisted.transcript,
+              pendingEdits: [],
+              displayName: persisted.displayName,
+            });
+          }
+        } catch (error) {
+          console.warn(`Failed to check session from ${file}:`, error);
+        }
+      }
+    } catch (error) {
+      console.debug("No persisted sessions to check for crashes:", error);
+    }
+
+    // Sort by last accessed (most recent first based on created_at)
+    crashedSessions.sort((a, b) => b.created_at - a.created_at);
+
+    return crashedSessions;
   }
 }
 

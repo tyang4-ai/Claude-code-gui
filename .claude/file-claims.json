@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-01-12T16:00:00Z",
+  "claims": {
+    "src/core/cli-bridge/index.ts": "agent-cli-bridge",
+    "src/__tests__/core/cli-bridge.test.ts": "agent-cli-bridge",
+    "src/components/tools/EditCard.tsx": "agent-edit-arbiter",
+    "src/components/tools/DiffViewer.tsx": "agent-edit-arbiter",
+    "src/components/layout/CommandPalette.tsx": "agent-command-palette",
+    "src/modules/commands/registry.ts": "agent-command-palette",
+    "src/modules/commands/fuzzy-search.ts": "agent-command-palette",
+    "src/modules/mcp/index.ts": "agent-mcp-manager",
+    "src/modules/mcp/types.ts": "agent-mcp-manager",
+    "src/components/mcp/MCPPanel.tsx": "agent-mcp-manager",
+    "src/components/mcp/MCPServerList.tsx": "agent-mcp-manager",
+    "src/core/store/index.ts": "SHARED",
+    "src/core/types.ts": "SHARED",
+    "CLAUDE.md": "SHARED",
+    "package.json": "SHARED"
+  }
+}

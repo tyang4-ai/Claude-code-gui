@@ -24,9 +24,10 @@ function BashCardComponent({
   exitCode,
   workingDir,
 }: BashCardProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState(false);
   const [copiedOutput, setCopiedOutput] = useState(false);
+  const [showRerunFeedback, setShowRerunFeedback] = useState(false);
 
   const isError = exitCode !== undefined && exitCode !== 0;
 
@@ -54,6 +55,16 @@ function BashCardComponent({
       console.error("Failed to copy:", e);
     }
   }, [output]);
+
+  const handleRerun = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(command);
+      setShowRerunFeedback(true);
+      setTimeout(() => setShowRerunFeedback(false), 2000);
+    } catch (e) {
+      console.error("Failed to copy command:", e);
+    }
+  }, [command]);
 
   const lineCount = output.split("\n").length;
 
@@ -117,6 +128,26 @@ function BashCardComponent({
         </div>
 
         <div className="flex items-center gap-1">
+          {/* Re-run button - copies command to clipboard */}
+          <button
+            className="p-1.5 rounded hover:bg-primary/20 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRerun();
+            }}
+            title="Copy command to clipboard (re-run)"
+          >
+            {showRerunFeedback ? (
+              <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            )}
+          </button>
+
           {/* Copy command button */}
           <button
             className="p-1.5 rounded hover:bg-primary/20 transition-colors"
@@ -124,7 +155,7 @@ function BashCardComponent({
               e.stopPropagation();
               handleCopyCommand();
             }}
-            title="Copy command"
+            title="Copy command to clipboard"
           >
             {copiedCommand ? (
               <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,6 +186,13 @@ function BashCardComponent({
           </svg>
         </div>
       </div>
+
+      {/* Preview line when collapsed */}
+      {!isExpanded && output && (
+        <div style={{ color: '#a0a0a0', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: '#0d1117' }}>
+          {output.split('\n')[0].substring(0, 80)}{output.length > 80 || output.includes('\n') ? '...' : ''}
+        </div>
+      )}
 
       {/* Terminal output */}
       {isExpanded && (

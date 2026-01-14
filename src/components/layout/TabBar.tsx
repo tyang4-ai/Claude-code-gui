@@ -2,16 +2,19 @@
  * TabBar - Browser-style session tabs
  *
  * Displays all active sessions as tabs with:
- * - Session name (project directory)
+ * - Session name (project directory or custom display name)
  * - Status indicator (thinking, idle, error)
  * - Close button
  * - New session button
+ * - Double-click to rename inline
+ * - Tooltip with full working directory path
+ * - Right-click context menu with Rename option
  */
 
-import { useCallback, useState } from "react";
-import { open } from "@tauri-apps/plugin-dialog";
+import { useCallback, useState, useRef, useEffect } from "react";
 import { useStore } from "../../core/store";
 import { getCLIBridge } from "../../core/cli-bridge";
+import { SettingsPanel } from "./SettingsPanel";
 import type { Session } from "../../core/types";
 
 interface TabBarProps {
@@ -19,19 +22,109 @@ interface TabBarProps {
   activeSession: Session | null;
 }
 
+// Context menu state
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  sessionId: string | null;
+}
+
 export function TabBar({ sessions, activeSession }: TabBarProps) {
   const [isCreating, setIsCreating] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    sessionId: null,
+  });
+  const editInputRef = useRef<HTMLInputElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   const setActiveSession = useStore((state) => state.setActiveSession);
   const closeSession = useStore((state) => state.closeSession);
   const createSession = useStore((state) => state.createSession);
+  const renameSession = useStore((state) => state.renameSession);
   const defaultModel = useStore((state) => state.defaultModel);
+  const sidebarOpen = useStore((state) => state.sidebarOpen);
+  const toggleSidebar = useStore((state) => state.toggleSidebar);
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (editingSessionId && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingSessionId]);
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        setContextMenu((prev) => ({ ...prev, visible: false }));
+      }
+    };
+
+    if (contextMenu.visible) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [contextMenu.visible]);
+
+  // Start editing a session name
+  const startEditing = useCallback((session: Session) => {
+    setEditingSessionId(session.id);
+    setEditValue(session.displayName || getProjectName(session.working_dir));
+  }, []);
+
+  // Finish editing and save
+  const finishEditing = useCallback(() => {
+    if (editingSessionId) {
+      renameSession(editingSessionId, editValue);
+      setEditingSessionId(null);
+      setEditValue("");
+    }
+  }, [editingSessionId, editValue, renameSession]);
+
+  // Cancel editing
+  const cancelEditing = useCallback(() => {
+    setEditingSessionId(null);
+    setEditValue("");
+  }, []);
+
+  // Handle context menu
+  const handleContextMenu = useCallback((e: React.MouseEvent, sessionId: string) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      sessionId,
+    });
+  }, []);
+
+  // Handle rename from context menu
+  const handleRenameFromMenu = useCallback(() => {
+    if (contextMenu.sessionId) {
+      const session = sessions.find((s) => s.id === contextMenu.sessionId);
+      if (session) {
+        startEditing(session);
+      }
+    }
+    setContextMenu((prev) => ({ ...prev, visible: false }));
+  }, [contextMenu.sessionId, sessions, startEditing]);
 
   const handleNewSession = useCallback(async () => {
     if (isCreating) return;
 
     try {
       setIsCreating(true);
+
+      // Dynamically import dialog plugin to avoid crash on load
+      const { open } = await import("@tauri-apps/plugin-dialog");
 
       // Open folder picker dialog
       const selectedDir = await open({
@@ -48,8 +141,8 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
       const workingDir = selectedDir as string;
       const cliBridge = getCLIBridge();
 
-      // Spawn interactive CLI session
-      const sessionId = await cliBridge.spawnInteractive({
+      // Create CLI session
+      const sessionId = await cliBridge.createSession({
         working_dir: workingDir,
         model: defaultModel,
       });
@@ -87,73 +180,167 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
     return parts[parts.length - 1] || workingDir;
   };
 
-  const getStatusColor = (status: Session["status"]): string => {
-    switch (status) {
-      case "thinking":
-        return "bg-yellow-500";
-      case "error":
-        return "bg-red-500";
-      case "idle":
-        return "bg-green-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
   return (
     <div
-      className="flex items-center h-10 bg-secondary border-b border-default px-2 gap-1"
+      style={{
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        height: '40px',
+        background: 'linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-base) 100%)',
+        borderBottom: '1px solid var(--color-border-muted)',
+        padding: '0 8px',
+        gap: '4px',
+        color: 'var(--color-text-primary)'
+      }}
       role="tablist"
       aria-label="Session tabs"
     >
+      {/* Sidebar toggle button */}
+      <button
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '32px',
+          height: '32px',
+          borderRadius: 'var(--radius-sm)',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: sidebarOpen ? 'var(--color-accent)' : 'var(--color-text-primary)',
+          transition: 'color var(--transition-fast)'
+        }}
+        onClick={toggleSidebar}
+        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+        data-testid="sidebar-toggle"
+      >
+        <svg
+          style={{ width: '16px', height: '16px' }}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+
       {sessions.map((session) => (
         <div
           key={session.id}
           role="tab"
           aria-selected={session.id === activeSession?.id}
           tabIndex={0}
-          className={`
-            flex items-center gap-2 px-3 py-1.5 rounded-t-md cursor-pointer
-            transition-colors text-sm
-            ${
-              session.id === activeSession?.id
-                ? "bg-primary text-primary"
-                : "bg-tertiary text-secondary hover:bg-primary/50"
-            }
-          `}
+          title={session.working_dir}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
+            cursor: 'pointer',
+            fontSize: 'var(--text-base)',
+            backgroundColor: session.id === activeSession?.id ? 'var(--color-bg-elevated)' : 'transparent',
+            color: session.id === activeSession?.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+            borderBottom: session.id === activeSession?.id ? '2px solid var(--color-accent)' : '2px solid transparent',
+            boxShadow: session.id === activeSession?.id ? 'var(--shadow-sm)' : 'none',
+            transition: 'all var(--transition-base)'
+          }}
           onClick={() => setActiveSession(session.id)}
+          onDoubleClick={() => startEditing(session)}
+          onContextMenu={(e) => handleContextMenu(e, session.id)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               setActiveSession(session.id);
+            }
+            if (e.key === "F2") {
+              startEditing(session);
             }
           }}
         >
           {/* Status indicator */}
           <div
-            className={`w-2 h-2 rounded-full ${getStatusColor(session.status)}`}
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: session.status === 'thinking' ? 'var(--color-warning)' : session.status === 'error' ? 'var(--color-error)' : 'var(--color-success)',
+              boxShadow: session.status === 'thinking' ? '0 0 6px var(--color-warning)' : 'none'
+            }}
             data-testid={
               session.status === "thinking" ? "thinking-indicator" : undefined
             }
             aria-label={`Status: ${session.status}`}
           />
 
-          {/* Project name */}
-          <span className="max-w-32 truncate">
-            {getProjectName(session.working_dir)}
-          </span>
+          {/* Project name - editable inline */}
+          {editingSessionId === session.id ? (
+            <input
+              ref={editInputRef}
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={finishEditing}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === "Enter") {
+                  finishEditing();
+                } else if (e.key === "Escape") {
+                  cancelEditing();
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                maxWidth: '128px',
+                padding: '2px 4px',
+                fontSize: 'var(--text-base)',
+                backgroundColor: 'var(--color-bg-base)',
+                color: 'var(--color-text-primary)',
+                border: '1px solid var(--color-accent)',
+                borderRadius: 'var(--radius-sm)',
+                outline: 'none',
+                boxShadow: 'var(--shadow-glow)'
+              }}
+              data-testid="tab-rename-input"
+            />
+          ) : (
+            <span
+              style={{ maxWidth: '128px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              title={`Double-click to rename\n${session.working_dir}`}
+            >
+              {session.displayName || getProjectName(session.working_dir)}
+            </span>
+          )}
 
           {/* Close button */}
           <button
-            className="ml-1 p-0.5 rounded hover:bg-tertiary transition-colors"
+            style={{
+              marginLeft: '4px',
+              padding: '2px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'inherit',
+              opacity: 0.7,
+              transition: 'opacity var(--transition-fast)'
+            }}
             onClick={(e) => {
               e.stopPropagation();
               handleCloseSession(session.id);
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}
             aria-label="Close tab"
             data-testid="close-tab-button"
           >
             <svg
-              className="w-3 h-3"
+              style={{ width: '12px', height: '12px' }}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -171,60 +358,64 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
 
       {/* New session button */}
       <button
-        className="flex items-center justify-center w-8 h-8 rounded hover:bg-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '32px',
+          height: '32px',
+          borderRadius: 'var(--radius-sm)',
+          background: 'none',
+          border: 'none',
+          cursor: isCreating ? 'not-allowed' : 'pointer',
+          opacity: isCreating ? 0.5 : 1,
+          color: 'var(--color-text-primary)',
+          transition: 'color var(--transition-fast)'
+        }}
         onClick={handleNewSession}
         disabled={isCreating}
         aria-label={isCreating ? "Creating session..." : "New session"}
         data-testid="new-session-button"
       >
-        {isCreating ? (
-          <svg
-            className="w-4 h-4 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-        ) : (
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-        )}
+        <svg
+          style={{ width: '16px', height: '16px' }}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
       </button>
 
       {/* Spacer */}
-      <div className="flex-1" />
+      <div style={{ flex: 1 }} />
 
       {/* Settings button */}
       <button
-        className="flex items-center justify-center w-8 h-8 rounded hover:bg-tertiary transition-colors"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '32px',
+          height: '32px',
+          borderRadius: 'var(--radius-sm)',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: showSettings ? 'var(--color-accent)' : 'var(--color-text-primary)',
+          transition: 'color var(--transition-fast)'
+        }}
+        onClick={() => setShowSettings(!showSettings)}
         aria-label="Settings"
         data-testid="settings-button"
       >
         <svg
-          className="w-4 h-4"
+          style={{ width: '16px', height: '16px' }}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -243,6 +434,66 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
           />
         </svg>
       </button>
+
+      {/* Settings dropdown */}
+      {showSettings && (
+        <SettingsPanel isOpen={showSettings} onClose={() => setShowSettings(false)} />
+      )}
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div
+          ref={contextMenuRef}
+          style={{
+            position: 'fixed',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            backgroundColor: 'var(--color-bg-elevated)',
+            border: '1px solid var(--color-border-default)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 1000,
+            minWidth: '120px',
+            padding: '4px 0'
+          }}
+          data-testid="tab-context-menu"
+        >
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '8px 12px',
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-primary)',
+              cursor: 'pointer',
+              fontSize: 'var(--text-base)',
+              textAlign: 'left',
+              transition: 'background-color var(--transition-fast)'
+            }}
+            onClick={handleRenameFromMenu}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <svg
+              style={{ width: '14px', height: '14px' }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Rename
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -22,7 +22,34 @@ import type {
   VariableContext,
   ResolvedTemplate,
   TemplateVariable,
+  TemplateCategory,
 } from "./types";
+
+/**
+ * All available template categories
+ */
+export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
+  "general",
+  "code-review",
+  "debugging",
+  "documentation",
+  "refactoring",
+  "testing",
+  "custom",
+];
+
+/**
+ * Category display names
+ */
+export const CATEGORY_LABELS: Record<TemplateCategory, string> = {
+  general: "General",
+  "code-review": "Code Review",
+  debugging: "Debugging",
+  documentation: "Documentation",
+  refactoring: "Refactoring",
+  testing: "Testing",
+  custom: "Custom",
+};
 
 /**
  * Template Manager - main API for working with templates
@@ -59,6 +86,7 @@ export class TemplateManager {
   async getAllTemplates(options?: {
     scope?: "global" | "project";
     projectPath?: string;
+    category?: TemplateCategory;
     favoritesFirst?: boolean;
   }): Promise<Template[]> {
     return templateStorage.getAll(options);
@@ -97,6 +125,13 @@ export class TemplateManager {
    */
   async duplicateTemplate(id: string, newName?: string): Promise<Template | null> {
     return templateStorage.duplicate(id, newName);
+  }
+
+  /**
+   * Get all categories currently in use
+   */
+  async getUsedCategories(): Promise<TemplateCategory[]> {
+    return templateStorage.getUsedCategories();
   }
 
   // === Variable Substitution ===
@@ -218,6 +253,7 @@ export type {
   VariableContext,
   ResolvedTemplate,
   TemplateVariable,
+  TemplateCategory,
   PromptHistoryEntry,
 } from "./types";
 

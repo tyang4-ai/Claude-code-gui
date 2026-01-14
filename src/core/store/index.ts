@@ -35,6 +35,7 @@ interface SettingsState {
   yoloMode: boolean;
   defaultModel: string;
   globalHotkey: string;
+  promptHistory: string[];
 }
 
 interface RootState extends SessionsState, UIState, SettingsState {
@@ -46,6 +47,7 @@ interface RootState extends SessionsState, UIState, SettingsState {
     sessionId: string,
     status: SessionInfo["status"]
   ) => void;
+  renameSession: (sessionId: string, newName: string) => void;
   appendToTranscript: (sessionId: string, entry: TranscriptEntry) => void;
   updateLastAssistantMessage: (
     sessionId: string,
@@ -54,6 +56,8 @@ interface RootState extends SessionsState, UIState, SettingsState {
   addPendingEdit: (sessionId: string, edit: PendingEdit) => void;
   removePendingEdit: (sessionId: string, editId: string) => void;
   reorderSessions: (fromIndex: number, toIndex: number) => void;
+  updateContextWindow: (sessionId: string, used: number, total: number) => void;
+  updateSessionCost: (sessionId: string, costUsd: number) => void;
 
   // UI actions
   toggleSidebar: () => void;
@@ -63,6 +67,8 @@ interface RootState extends SessionsState, UIState, SettingsState {
   setYoloMode: (enabled: boolean) => void;
   setDefaultModel: (model: string) => void;
   setGlobalHotkey: (hotkey: string) => void;
+  addPromptHistory: (prompt: string) => void;
+  clearPromptHistory: () => void;
 }
 
 // ============================================================================
@@ -81,6 +87,7 @@ export const useStore = create<RootState>()(
         yoloMode: false,
         defaultModel: "sonnet",
         globalHotkey: "CommandOrControl+Shift+Space",
+        promptHistory: [],
 
         // Session actions
         createSession: (info: SessionInfo) =>
@@ -125,6 +132,18 @@ export const useStore = create<RootState>()(
               const session = state.sessions[sessionId];
               if (session) {
                 session.status = status;
+              }
+            })
+          ),
+
+        renameSession: (sessionId: string, newName: string) =>
+          set(
+            produce((state: RootState) => {
+              const session = state.sessions[sessionId];
+              if (session) {
+                // Trim whitespace; if empty string, clear the custom name
+                const trimmed = newName.trim();
+                session.displayName = trimmed || undefined;
               }
             })
           ),
@@ -194,6 +213,27 @@ export const useStore = create<RootState>()(
             })
           ),
 
+        updateContextWindow: (sessionId: string, used: number, total: number) =>
+          set(
+            produce((state: RootState) => {
+              const session = state.sessions[sessionId];
+              if (session) {
+                session.contextTokensUsed = used;
+                session.contextTokensTotal = total;
+              }
+            })
+          ),
+
+        updateSessionCost: (sessionId: string, costUsd: number) =>
+          set(
+            produce((state: RootState) => {
+              const session = state.sessions[sessionId];
+              if (session) {
+                session.total_cost_usd = costUsd;
+              }
+            })
+          ),
+
         // UI actions
         toggleSidebar: () =>
           set(
@@ -230,6 +270,30 @@ export const useStore = create<RootState>()(
               state.globalHotkey = hotkey;
             })
           ),
+
+        addPromptHistory: (prompt: string) =>
+          set(
+            produce((state: RootState) => {
+              // Remove duplicate if exists
+              const existingIndex = state.promptHistory.indexOf(prompt);
+              if (existingIndex !== -1) {
+                state.promptHistory.splice(existingIndex, 1);
+              }
+              // Add to beginning (most recent first)
+              state.promptHistory.unshift(prompt);
+              // Keep max 100 entries
+              if (state.promptHistory.length > 100) {
+                state.promptHistory = state.promptHistory.slice(0, 100);
+              }
+            })
+          ),
+
+        clearPromptHistory: () =>
+          set(
+            produce((state: RootState) => {
+              state.promptHistory = [];
+            })
+          ),
       }),
       {
         name: "claude-gui-storage",
@@ -240,6 +304,7 @@ export const useStore = create<RootState>()(
           yoloMode: state.yoloMode,
           defaultModel: state.defaultModel,
           globalHotkey: state.globalHotkey,
+          promptHistory: state.promptHistory,
         }),
       }
     )
@@ -279,48 +344,58 @@ export const selectPendingEditCount = (state: RootState): number => {
  * Initialize session persistence - load sessions and set up auto-save
  */
 export async function initializeSessionPersistence(): Promise<void> {
-  const storage = getSessionStorage();
-  await storage.initialize();
+  try {
+    const storage = getSessionStorage();
+    await storage.initialize();
 
-  // Load persisted sessions
-  const persistedSessions = await storage.loadAllSessions();
+    // Load persisted sessions
+    let persistedSessions: Session[] = [];
+    try {
+      persistedSessions = await storage.loadAllSessions();
+    } catch (e) {
+      console.warn("Failed to load persisted sessions:", e);
+    }
 
-  if (persistedSessions.length > 0) {
-    useStore.setState(
-      produce((state: RootState) => {
-        for (const session of persistedSessions) {
-          state.sessions[session.id] = session;
+    if (persistedSessions.length > 0) {
+      useStore.setState(
+        produce((state: RootState) => {
+          for (const session of persistedSessions) {
+            state.sessions[session.id] = session;
+          }
+          // Set the most recent session as active if none is active
+          if (!state.activeSessionId && persistedSessions.length > 0) {
+            state.activeSessionId = persistedSessions[0].id;
+          }
+        })
+      );
+    }
+
+    // Set up auto-save subscription
+    useStore.subscribe(
+      (state) => state.sessions,
+      (sessions, prevSessions) => {
+        // Find sessions that changed
+        for (const [id, session] of Object.entries(sessions)) {
+          const prevSession = prevSessions[id];
+          if (!prevSession || session !== prevSession) {
+            // Session was created or modified - save it
+            storage.saveSessionDebounced(session);
+          }
         }
-        // Set the most recent session as active if none is active
-        if (!state.activeSessionId && persistedSessions.length > 0) {
-          state.activeSessionId = persistedSessions[0].id;
+
+        // Find deleted sessions
+        for (const id of Object.keys(prevSessions)) {
+          if (!sessions[id]) {
+            storage.deleteSession(id);
+          }
         }
-      })
+      },
+      { equalityFn: Object.is }
     );
+  } catch (error) {
+    console.error("Session persistence initialization failed:", error);
+    // Continue without persistence
   }
-
-  // Set up auto-save subscription
-  useStore.subscribe(
-    (state) => state.sessions,
-    (sessions, prevSessions) => {
-      // Find sessions that changed
-      for (const [id, session] of Object.entries(sessions)) {
-        const prevSession = prevSessions[id];
-        if (!prevSession || session !== prevSession) {
-          // Session was created or modified - save it
-          storage.saveSessionDebounced(session);
-        }
-      }
-
-      // Find deleted sessions
-      for (const id of Object.keys(prevSessions)) {
-        if (!sessions[id]) {
-          storage.deleteSession(id);
-        }
-      }
-    },
-    { equalityFn: Object.is }
-  );
 }
 
 /**

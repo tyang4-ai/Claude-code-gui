@@ -122,7 +122,7 @@ export class CommandPaletteManager {
    * Search commands
    */
   searchCommands(query: string, limit = 20): Command[] {
-    return commandRegistry.search(query, limit);
+    return commandRegistry.search(query, limit).map(result => result.command);
   }
 
   /**

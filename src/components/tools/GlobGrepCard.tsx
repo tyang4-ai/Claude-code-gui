@@ -29,7 +29,7 @@ function GlobGrepCardComponent({
   files,
   matchCount,
 }: GlobGrepCardProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [copiedPath, setCopiedPath] = useState<string | null>(null);
 
   const handleCopyPath = useCallback(async (path: string) => {
@@ -143,6 +143,13 @@ function GlobGrepCardComponent({
           </svg>
         </div>
       </div>
+
+      {/* Preview line when collapsed */}
+      {!isExpanded && files.length > 0 && (
+        <div style={{ color: '#a0a0a0', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: '#0d1117' }}>
+          {files[0].path.substring(0, 80)}{files[0].path.length > 80 ? '...' : ''}{files.length > 1 ? ` (+${files.length - 1} more)` : ''}
+        </div>
+      )}
 
       {/* File list */}
       {isExpanded && (

@@ -3,9 +3,11 @@
 //! This module contains all the command handlers that can be invoked from the frontend.
 
 pub mod files;
+pub mod mcp;
 pub mod session;
 pub mod system;
 
 pub use files::*;
+pub use mcp::*;
 pub use session::*;
 pub use system::*;

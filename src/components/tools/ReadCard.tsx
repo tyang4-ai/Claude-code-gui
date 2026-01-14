@@ -25,7 +25,7 @@ function ReadCardComponent({
   startLine,
   endLine,
 }: ReadCardProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const lineCount = content.split("\n").length;
@@ -140,6 +140,13 @@ function ReadCardComponent({
           </svg>
         </div>
       </div>
+
+      {/* Preview line when collapsed */}
+      {!isExpanded && content && (
+        <div style={{ color: '#a0a0a0', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: '#0d1117' }}>
+          {content.split('\n')[0].substring(0, 80)}{content.length > 80 || content.includes('\n') ? '...' : ''}
+        </div>
+      )}
 
       {/* Content */}
       {isExpanded && (

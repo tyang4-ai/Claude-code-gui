@@ -11,7 +11,9 @@ import type {
   CreateTemplateInput,
   UpdateTemplateInput,
   TemplateStorage as TemplateStorageData,
+  TemplateCategory,
 } from "./types";
+import { extractVariables } from "./variables";
 
 const STORAGE_VERSION = 1;
 const TEMPLATES_FILENAME = "templates.json";
@@ -69,6 +71,14 @@ class TemplateStorageManager {
 
       // Load templates into map
       for (const template of data.templates) {
+        // Ensure variables field exists (migration from old format)
+        if (!template.variables) {
+          template.variables = extractVariables(template.content);
+        }
+        // Ensure category field exists (migration from old format)
+        if (!template.category) {
+          template.category = "general";
+        }
         this.templates.set(template.id, template);
       }
 
@@ -105,12 +115,14 @@ class TemplateStorageManager {
     await this.load();
 
     const now = Date.now();
+    const variables = extractVariables(input.content);
     const template: Template = {
       ...input,
       id: crypto.randomUUID(),
       createdAt: now,
       updatedAt: now,
       usageCount: 0,
+      variables,
     };
 
     this.templates.set(template.id, template);
@@ -128,11 +140,12 @@ class TemplateStorageManager {
   }
 
   /**
-   * Get all templates, optionally filtered by scope
+   * Get all templates, optionally filtered by scope and/or category
    */
   async getAll(options?: {
     scope?: "global" | "project";
     projectPath?: string;
+    category?: TemplateCategory;
     favoritesFirst?: boolean;
   }): Promise<Template[]> {
     await this.load();
@@ -146,6 +159,11 @@ class TemplateStorageManager {
       templates = templates.filter(
         (t) => t.scope === "project" && t.projectPath === options.projectPath
       );
+    }
+
+    // Filter by category
+    if (options?.category) {
+      templates = templates.filter((t) => t.category === options.category);
     }
 
     // Sort: favorites first, then by usage count (descending)
@@ -170,9 +188,16 @@ class TemplateStorageManager {
     const existing = this.templates.get(id);
     if (!existing) return null;
 
+    // Re-extract variables if content changed
+    let variables = existing.variables;
+    if (updates.content && updates.content !== existing.content) {
+      variables = extractVariables(updates.content);
+    }
+
     const updated: Template = {
       ...existing,
       ...updates,
+      variables,
       updatedAt: Date.now(),
     };
 
@@ -236,7 +261,8 @@ class TemplateStorageManager {
       (t) =>
         t.name.toLowerCase().includes(lowerQuery) ||
         t.content.toLowerCase().includes(lowerQuery) ||
-        t.description?.toLowerCase().includes(lowerQuery)
+        t.description?.toLowerCase().includes(lowerQuery) ||
+        t.category.toLowerCase().includes(lowerQuery)
     );
   }
 
@@ -277,13 +303,17 @@ class TemplateStorageManager {
 
     for (const template of data) {
       // Generate new ID to avoid conflicts
-      const imported_template: Template = {
+      const importedTemplate: Template = {
         ...template,
         id: crypto.randomUUID(),
         createdAt: now,
         updatedAt: now,
+        // Ensure variables are extracted
+        variables: template.variables || extractVariables(template.content),
+        // Ensure category exists
+        category: template.category || "general",
       };
-      this.templates.set(imported_template.id, imported_template);
+      this.templates.set(importedTemplate.id, importedTemplate);
       imported++;
     }
 
@@ -329,6 +359,18 @@ class TemplateStorageManager {
     this.loaded = false;
     this.templates.clear();
     await this.load();
+  }
+
+  /**
+   * Get all unique categories currently in use
+   */
+  async getUsedCategories(): Promise<TemplateCategory[]> {
+    await this.load();
+    const categories = new Set<TemplateCategory>();
+    for (const template of this.templates.values()) {
+      categories.add(template.category);
+    }
+    return Array.from(categories);
   }
 }
 

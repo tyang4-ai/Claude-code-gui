@@ -156,6 +156,9 @@ export interface SessionInfo {
   created_at: number;
   prompt_count: number;
   total_cost_usd: number;
+  displayName?: string; // Custom user-defined name for the session
+  contextTokensUsed?: number; // Current context window usage
+  contextTokensTotal?: number; // Total context window size (200K for Opus)
 }
 
 export interface Session extends SessionInfo {

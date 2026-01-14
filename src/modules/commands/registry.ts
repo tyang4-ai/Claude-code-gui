@@ -5,6 +5,16 @@
  */
 
 import type { Command, CommandCategory, CommandRegistration } from "./types";
+import { fuzzySearchMultiField, type FuzzyMatch } from "./fuzzy-search";
+
+/**
+ * Recent command tracking
+ */
+interface RecentCommandData {
+  commandId: string;
+  lastUsed: number;
+  useCount: number;
+}
 
 /**
  * Command Registry - manages all available commands
@@ -12,6 +22,8 @@ import type { Command, CommandCategory, CommandRegistration } from "./types";
 class CommandRegistry {
   private commands: Map<string, CommandRegistration> = new Map();
   private listeners: Set<() => void> = new Set();
+  private recentCommands: Map<string, RecentCommandData> = new Map();
+  private readonly MAX_RECENT = 10;
 
   /**
    * Register a command
@@ -68,58 +80,41 @@ class CommandRegistry {
   }
 
   /**
-   * Search commands by query
+   * Search commands by query using fuzzy matching
    */
-  search(query: string, limit = 20): Command[] {
+  search(query: string, limit = 20): Array<{ command: Command; match: FuzzyMatch }> {
+    const allCommands = Array.from(this.commands.values())
+      .map((r) => r.command)
+      .filter((cmd) => !cmd.enabled || cmd.enabled());
+
     if (!query.trim()) {
-      return this.getAll().slice(0, limit);
+      return allCommands.slice(0, limit).map((command) => ({
+        command,
+        match: {
+          target: command.label,
+          score: 1,
+          matchedIndices: [],
+        },
+      }));
     }
 
-    const lowerQuery = query.toLowerCase();
-    const results: Array<{ command: Command; score: number }> = [];
+    // Use fuzzy search across multiple fields
+    const results = fuzzySearchMultiField(
+      query,
+      allCommands,
+      [
+        (cmd) => cmd.label,
+        (cmd) => cmd.description || "",
+        (cmd) => cmd.keywords?.join(" ") || "",
+        (cmd) => cmd.category,
+      ],
+      limit
+    );
 
-    for (const { command } of this.commands.values()) {
-      // Check if command is enabled
-      if (command.enabled && !command.enabled()) {
-        continue;
-      }
-
-      let score = 0;
-
-      // Exact label match
-      if (command.label.toLowerCase() === lowerQuery) {
-        score = 100;
-      }
-      // Label starts with query
-      else if (command.label.toLowerCase().startsWith(lowerQuery)) {
-        score = 80;
-      }
-      // Label contains query
-      else if (command.label.toLowerCase().includes(lowerQuery)) {
-        score = 60;
-      }
-      // Description contains query
-      else if (command.description?.toLowerCase().includes(lowerQuery)) {
-        score = 40;
-      }
-      // Keywords match
-      else if (command.keywords?.some((k) => k.toLowerCase().includes(lowerQuery))) {
-        score = 30;
-      }
-      // Category matches
-      else if (command.category.toLowerCase().includes(lowerQuery)) {
-        score = 20;
-      }
-
-      if (score > 0) {
-        results.push({ command, score });
-      }
-    }
-
-    // Sort by score descending
-    results.sort((a, b) => b.score - a.score);
-
-    return results.slice(0, limit).map((r) => r.command);
+    return results.map((r) => ({
+      command: r.item,
+      match: r.match,
+    }));
   }
 
   /**
@@ -135,10 +130,86 @@ class CommandRegistry {
 
     try {
       await command.action();
+      this.trackRecentCommand(id);
       return true;
     } catch (e) {
       console.error(`Command ${id} failed:`, e);
       return false;
+    }
+  }
+
+  /**
+   * Track a command as recently used
+   */
+  private trackRecentCommand(id: string): void {
+    const existing = this.recentCommands.get(id);
+
+    if (existing) {
+      existing.lastUsed = Date.now();
+      existing.useCount++;
+    } else {
+      this.recentCommands.set(id, {
+        commandId: id,
+        lastUsed: Date.now(),
+        useCount: 1,
+      });
+    }
+
+    // Keep only MAX_RECENT items
+    if (this.recentCommands.size > this.MAX_RECENT) {
+      const sorted = Array.from(this.recentCommands.values()).sort(
+        (a, b) => b.lastUsed - a.lastUsed
+      );
+
+      this.recentCommands.clear();
+      for (let i = 0; i < this.MAX_RECENT; i++) {
+        this.recentCommands.set(sorted[i].commandId, sorted[i]);
+      }
+    }
+
+    // Persist to localStorage
+    this.persistRecentCommands();
+  }
+
+  /**
+   * Get recent commands
+   */
+  getRecentCommands(): Command[] {
+    const recent = Array.from(this.recentCommands.values())
+      .sort((a, b) => b.lastUsed - a.lastUsed)
+      .map((r) => this.get(r.commandId))
+      .filter((cmd): cmd is Command => cmd !== undefined);
+
+    return recent;
+  }
+
+  /**
+   * Persist recent commands to localStorage
+   */
+  private persistRecentCommands(): void {
+    try {
+      const data = Array.from(this.recentCommands.values());
+      localStorage.setItem("command-palette-recent", JSON.stringify(data));
+    } catch (e) {
+      console.warn("Failed to persist recent commands:", e);
+    }
+  }
+
+  /**
+   * Load recent commands from localStorage
+   */
+  loadRecentCommands(): void {
+    try {
+      const data = localStorage.getItem("command-palette-recent");
+      if (data) {
+        const recent: RecentCommandData[] = JSON.parse(data);
+        this.recentCommands.clear();
+        for (const item of recent) {
+          this.recentCommands.set(item.commandId, item);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load recent commands:", e);
     }
   }
 

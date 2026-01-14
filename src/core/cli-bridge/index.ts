@@ -11,14 +11,16 @@
  * - Messages stream via "cli-message" Tauri events
  */
 
-import { invoke } from "@tauri-apps/api/core";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { Subject, Observable, filter, map } from "rxjs";
+
+// Dynamic imports to avoid crashes during module load
+type UnlistenFn = () => void;
 import type {
   SessionConfig,
   SessionInfo,
   StreamMessage,
   ToolUseMessage,
+  ErrorMessage,
 } from "../types";
 
 // Event payload from Tauri backend
@@ -67,7 +69,9 @@ export class CLIBridge {
   }
 
   constructor() {
-    this.setupEventListeners();
+    this.setupEventListeners().catch((error) => {
+      console.warn("Failed to setup CLI event listeners:", error);
+    });
   }
 
   /**
@@ -77,26 +81,41 @@ export class CLIBridge {
     if (this.initialized) return;
     this.initialized = true;
 
-    // Listen for stream messages from backend
-    this.unlisten = await listen<StreamEvent>("cli-message", (event) => {
-      this.messageSubject.next(event.payload);
+    try {
+      // Dynamically import Tauri event API
+      const { listen } = await import("@tauri-apps/api/event");
 
-      // Update local session cache with status changes
-      const session = this.sessions.get(event.payload.sessionId);
-      if (session) {
-        // Update status based on message type
-        if (event.payload.message.type === "result") {
-          session.status = "idle";
-        } else if (event.payload.message.type === "error") {
-          session.status = "error";
-          const errMsg = event.payload.message as { error?: { message?: string } };
-          this.errorSubject.next({
-            sessionId: event.payload.sessionId,
-            message: errMsg.error?.message || "Unknown error",
-          });
+      // Listen for stream messages from backend
+      this.unlisten = await listen<StreamEvent>("cli-message", (event) => {
+        this.messageSubject.next(event.payload);
+
+        // Update local session cache with status changes
+        const session = this.sessions.get(event.payload.sessionId);
+        if (session) {
+          // Update status based on message type
+          if (event.payload.message.type === "result") {
+            session.status = "idle";
+          } else if (event.payload.message.type === "error") {
+            session.status = "error";
+            const errMsg = event.payload.message as { error?: { message?: string } };
+            this.errorSubject.next({
+              sessionId: event.payload.sessionId,
+              message: errMsg.error?.message || "Unknown error",
+            });
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.warn("Failed to listen for CLI messages:", error);
+    }
+  }
+
+  /**
+   * Helper to dynamically import and call invoke
+   */
+  private async invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return invoke<T>(cmd, args);
   }
 
   /**
@@ -106,7 +125,7 @@ export class CLIBridge {
    * This follows the spawn-per-prompt model.
    */
   async createSession(config: SessionConfig): Promise<string> {
-    const result = await invoke<CreateSessionResult>("spawn_session", {
+    const result = await this.invoke<CreateSessionResult>("spawn_session", {
       config: {
         working_dir: config.working_dir,
         model: config.model || "sonnet",
@@ -154,14 +173,14 @@ export class CLIBridge {
     // Update local status
     session.status = "thinking";
 
-    await invoke("send_prompt", { sessionId, prompt });
+    await this.invoke("send_prompt", { sessionId, prompt });
   }
 
   /**
    * Send interrupt signal (kills the active Claude CLI process)
    */
   async sendInterrupt(sessionId: string): Promise<void> {
-    await invoke("send_interrupt", { sessionId });
+    await this.invoke("send_interrupt", { sessionId });
 
     // Update local status
     const session = this.sessions.get(sessionId);
@@ -174,7 +193,7 @@ export class CLIBridge {
    * Terminate a session and clean up
    */
   async terminateSession(sessionId: string): Promise<void> {
-    await invoke("terminate_session", { sessionId });
+    await this.invoke("terminate_session", { sessionId });
     this.sessions.delete(sessionId);
   }
 
@@ -241,7 +260,7 @@ export class CLIBridge {
    * Refresh session list from backend
    */
   async refreshSessions(): Promise<void> {
-    const sessions = await invoke<SessionInfo[]>("get_sessions");
+    const sessions = await this.invoke<SessionInfo[]>("get_sessions");
     this.sessions.clear();
     for (const session of sessions) {
       this.sessions.set(session.id, session);
@@ -252,21 +271,21 @@ export class CLIBridge {
    * Check if a session is alive
    */
   async isAlive(sessionId: string): Promise<boolean> {
-    return invoke<boolean>("is_session_alive", { sessionId });
+    return this.invoke<boolean>("is_session_alive", { sessionId });
   }
 
   /**
    * Get session count
    */
   async getSessionCount(): Promise<number> {
-    return invoke<number>("get_session_count");
+    return this.invoke<number>("get_session_count");
   }
 
   /**
    * Terminate all sessions
    */
   async terminateAll(): Promise<void> {
-    await invoke("terminate_all_sessions");
+    await this.invoke("terminate_all_sessions");
     this.sessions.clear();
   }
 
@@ -286,6 +305,22 @@ export class CLIBridge {
    */
   _handleBackendEvent(sessionId: string, message: StreamMessage): void {
     this.messageSubject.next({ sessionId, message });
+
+    // Replicate the same logic as the event listener
+    const session = this.sessions.get(sessionId);
+    if (session) {
+      // Update status based on message type
+      if (message.type === "result") {
+        session.status = "idle";
+      } else if (message.type === "error") {
+        session.status = "error";
+        const errMsg = message as ErrorMessage;
+        this.errorSubject.next({
+          sessionId,
+          message: errMsg.error?.message || "Unknown error",
+        });
+      }
+    }
   }
 }
 

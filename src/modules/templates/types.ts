@@ -5,6 +5,18 @@
  */
 
 /**
+ * Template categories for organization
+ */
+export type TemplateCategory =
+  | "general"
+  | "code-review"
+  | "debugging"
+  | "documentation"
+  | "refactoring"
+  | "testing"
+  | "custom";
+
+/**
  * A reusable prompt template
  */
 export interface Template {
@@ -12,12 +24,15 @@ export interface Template {
   name: string;
   content: string;
   description?: string;
+  category: TemplateCategory;
   scope: "global" | "project";
   projectPath?: string; // Only for project-scoped templates
   isFavorite: boolean;
   createdAt: number;
   updatedAt: number;
   usageCount: number;
+  /** Variables extracted from content (e.g., {{projectName}}) */
+  variables: string[];
 }
 
 /**
@@ -25,14 +40,14 @@ export interface Template {
  */
 export type CreateTemplateInput = Omit<
   Template,
-  "id" | "createdAt" | "updatedAt" | "usageCount"
+  "id" | "createdAt" | "updatedAt" | "usageCount" | "variables"
 >;
 
 /**
  * Template update input (partial)
  */
 export type UpdateTemplateInput = Partial<
-  Omit<Template, "id" | "createdAt" | "updatedAt">
+  Omit<Template, "id" | "createdAt" | "updatedAt" | "variables">
 >;
 
 /**

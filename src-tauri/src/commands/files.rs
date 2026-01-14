@@ -197,6 +197,20 @@ pub async fn file_exists(path: &str) -> Result<bool, FileError> {
     Ok(Path::new(path).exists())
 }
 
+/// Ensure a directory exists, creating it if necessary
+#[tauri::command]
+pub async fn ensure_dir(path: &str) -> Result<(), FileError> {
+    fs::create_dir_all(path).await?;
+    Ok(())
+}
+
+/// Delete a file
+#[tauri::command]
+pub async fn delete_file(path: &str) -> Result<(), FileError> {
+    fs::remove_file(path).await?;
+    Ok(())
+}
+
 /// Get file metadata
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileMetadata {

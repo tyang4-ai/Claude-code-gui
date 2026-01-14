@@ -316,6 +316,47 @@ export function getSkillsManager(): SkillsManager {
   return SkillsManager.getInstance();
 }
 
-// Re-export types
+// Re-export types and modules
 export * from "./types";
+export * from "./browser-types";
 export { matchRules, generateActivationPrefix, getActivatedSkillNames } from "./rule-matcher";
+
+// Re-export browser functionality
+export {
+  useSkillsBrowser,
+  selectFilteredSkills,
+  selectActiveSkill,
+  selectSkillsByCategory,
+  selectEnabledSkillsCount,
+  selectSelectedSkillsArray,
+} from "./browser";
+
+// Re-export discovery functions
+export {
+  discoverSkills,
+  refreshSkills,
+  getSkillById,
+  getGlobalSkillsDir,
+} from "./discovery";
+
+// Re-export activation functions
+export {
+  loadConfigurations,
+  saveConfigurations,
+  toggleSkillActivation,
+  updateSkillConfiguration,
+  deleteSkillConfiguration,
+  getSkillConfiguration,
+  bulkToggleSkills,
+  bulkDeleteSkills,
+  exportSkillConfigurations,
+  importSkillConfigurations,
+  downloadExport,
+  uploadImport,
+  recordSkillUsage,
+  isSkillEnabled,
+  getEnabledSkills,
+  getAutoActivatedSkills,
+  validateSkillParameters,
+  createActivationEvent,
+} from "./activation";
