@@ -72,7 +72,13 @@ function GlobGrepCardComponent({
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-3 py-2 bg-tertiary border-b border-default cursor-pointer hover:bg-tertiary/80"
+        className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderColor: 'var(--color-border-default)',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)'}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -146,7 +152,7 @@ function GlobGrepCardComponent({
 
       {/* Preview line when collapsed */}
       {!isExpanded && files.length > 0 && (
-        <div style={{ color: '#a0a0a0', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: '#0d1117' }}>
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: 'var(--color-bg-base)' }}>
           {files[0].path.substring(0, 80)}{files[0].path.length > 80 ? '...' : ''}{files.length > 1 ? ` (+${files.length - 1} more)` : ''}
         </div>
       )}
@@ -159,11 +165,14 @@ function GlobGrepCardComponent({
               No files found
             </div>
           ) : (
-            <div className="divide-y divide-default/50">
+            <div style={{ borderColor: 'var(--color-border-muted)' }}>
               {files.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 px-3 py-2 hover:bg-tertiary/50 group"
+                  className="flex items-center gap-2 px-3 py-2 group"
+                  style={{ borderBottom: index < files.length - 1 ? '1px solid var(--color-border-muted)' : 'none' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   {/* File icon */}
                   <svg

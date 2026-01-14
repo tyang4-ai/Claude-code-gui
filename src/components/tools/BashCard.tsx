@@ -77,7 +77,13 @@ function BashCardComponent({
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-3 py-2 bg-tertiary border-b border-default cursor-pointer hover:bg-tertiary/80"
+        className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderColor: 'var(--color-border-default)',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)'}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -189,18 +195,19 @@ function BashCardComponent({
 
       {/* Preview line when collapsed */}
       {!isExpanded && output && (
-        <div style={{ color: '#a0a0a0', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: '#0d1117' }}>
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: 'var(--color-bg-base)' }}>
           {output.split('\n')[0].substring(0, 80)}{output.length > 80 || output.includes('\n') ? '...' : ''}
         </div>
       )}
 
       {/* Terminal output */}
       {isExpanded && (
-        <div className="bg-[#0d1117] relative group">
+        <div className="relative group" style={{ backgroundColor: 'var(--color-bg-base)' }}>
           {/* Copy output button (shown on hover) */}
           {output && (
             <button
-              className="absolute top-2 right-2 p-1.5 rounded bg-tertiary/80 hover:bg-tertiary opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-2 right-2 p-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ backgroundColor: 'var(--color-bg-overlay)' }}
               onClick={handleCopyOutput}
               title="Copy output"
             >

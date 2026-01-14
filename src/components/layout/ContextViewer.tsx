@@ -181,7 +181,7 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
         alignItems: "center",
         justifyContent: "center",
         height: "100%",
-        color: "#a0a0a0",
+        color: "var(--color-text-secondary)",
       }}>
         Loading context...
       </div>
@@ -207,22 +207,22 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
       >
         <div
           style={{
-            backgroundColor: "#1d3d47",
+            backgroundColor: "var(--color-bg-elevated)",
             borderRadius: "12px",
             padding: "24px",
             minWidth: "300px",
-            border: "1px solid #2a9d8f",
+            border: "1px solid var(--color-border-muted)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-            <span style={{ fontSize: "18px", fontWeight: 600, color: "#e8e8e8" }}>Context Viewer</span>
+            <span style={{ fontSize: "18px", fontWeight: 600, color: "var(--color-text-primary)" }}>Context Viewer</span>
             <button
               onClick={onClose}
               style={{
                 background: "none",
                 border: "none",
-                color: "#a0a0a0",
+                color: "var(--color-text-secondary)",
                 cursor: "pointer",
                 fontSize: "20px",
                 padding: "4px",
@@ -247,7 +247,7 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
                 onClick={loadContext}
                 style={{
                   padding: "8px 16px",
-                  background: "#2a9d8f",
+                  background: "var(--color-accent)",
                   border: "none",
                   borderRadius: "4px",
                   color: "white",
@@ -262,9 +262,9 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
                 style={{
                   padding: "8px 16px",
                   background: "transparent",
-                  border: "1px solid #a0a0a0",
+                  border: "1px solid var(--color-text-secondary)",
                   borderRadius: "4px",
-                  color: "#a0a0a0",
+                  color: "var(--color-text-secondary)",
                   cursor: "pointer",
                   fontSize: "14px",
                 }}
@@ -284,8 +284,8 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        backgroundColor: "#1a1a1a",
-        color: "#e8e8e8",
+        backgroundColor: "var(--color-bg-base)",
+        color: "var(--color-text-primary)",
       }}
       data-testid="context-viewer"
     >
@@ -296,13 +296,13 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
           alignItems: "center",
           justifyContent: "space-between",
           padding: "12px 16px",
-          borderBottom: "1px solid #2a9d8f",
-          backgroundColor: "#1d3d47",
+          borderBottom: "1px solid var(--color-border-muted)",
+          backgroundColor: "var(--color-bg-elevated)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <svg
-            style={{ width: "20px", height: "20px", color: "#2a9d8f" }}
+            style={{ width: "20px", height: "20px", color: "var(--color-accent)" }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -324,7 +324,7 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#e8e8e8",
+              color: "var(--color-text-primary)",
               display: "flex",
               alignItems: "center",
             }}
@@ -357,10 +357,10 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
           style={{
             width: "100%",
             padding: "8px 12px",
-            background: "#264653",
-            border: "1px solid #2a9d8f",
+            background: "var(--color-bg-surface)",
+            border: "1px solid var(--color-border-muted)",
             borderRadius: "4px",
-            color: "#e8e8e8",
+            color: "var(--color-text-primary)",
             fontSize: "14px",
             outline: "none",
           }}
@@ -378,7 +378,7 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
             overflowY: "auto",
           }}
         >
-          <div style={{ fontSize: "12px", color: "#a0a0a0", marginBottom: "8px" }}>
+          <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "8px" }}>
             Found {filteredContent.length} result(s)
           </div>
           {filteredContent.map((result, idx) => (
@@ -387,12 +387,12 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
               style={{
                 padding: "8px",
                 marginBottom: "8px",
-                background: "#264653",
+                background: "var(--color-bg-surface)",
                 borderRadius: "4px",
                 fontSize: "13px",
               }}
             >
-              <div style={{ color: "#2a9d8f", fontWeight: 600 }}>
+              <div style={{ color: "var(--color-accent)", fontWeight: 600 }}>
                 {result.type}: {result.label}
               </div>
               <div
@@ -418,7 +418,7 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
           gap: "4px",
           padding: "0 16px",
           borderBottom: "1px solid #333",
-          backgroundColor: "#1d3d47",
+          backgroundColor: "var(--color-bg-elevated)",
         }}
       >
         {(["claude-md", "hooks", "mcp", "settings"] as TabType[]).map((tab) => (
@@ -427,10 +427,10 @@ export function ContextViewer({ isOpen, workingDir = ".", onClose }: ContextView
             onClick={() => setActiveTab(tab)}
             style={{
               padding: "12px 16px",
-              background: activeTab === tab ? "#264653" : "transparent",
+              background: activeTab === tab ? "var(--color-bg-surface)" : "transparent",
               border: "none",
-              borderBottom: activeTab === tab ? "2px solid #2a9d8f" : "2px solid transparent",
-              color: activeTab === tab ? "#2a9d8f" : "#a0a0a0",
+              borderBottom: activeTab === tab ? "2px solid var(--color-accent)" : "2px solid transparent",
+              color: activeTab === tab ? "var(--color-accent)" : "var(--color-text-secondary)",
               cursor: "pointer",
               fontSize: "14px",
               fontWeight: activeTab === tab ? 600 : 400,
@@ -492,7 +492,7 @@ function ClaudeMdTab({ files, onCopy, copiedPath }: ClaudeMdTabProps) {
 
   if (existingFiles.length === 0) {
     return (
-      <div style={{ color: "#a0a0a0", fontSize: "14px" }}>
+      <div style={{ color: "var(--color-text-secondary)", fontSize: "14px" }}>
         No CLAUDE.md files found in this project.
       </div>
     );
@@ -511,10 +511,10 @@ function ClaudeMdTab({ files, onCopy, copiedPath }: ClaudeMdTabProps) {
             }}
           >
             <div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#2a9d8f" }}>
+              <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-accent)" }}>
                 {file.scope.toUpperCase()}
               </div>
-              <div style={{ fontSize: "12px", color: "#a0a0a0", fontFamily: "monospace" }}>
+              <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", fontFamily: "monospace" }}>
                 {file.path}
               </div>
             </div>
@@ -522,7 +522,7 @@ function ClaudeMdTab({ files, onCopy, copiedPath }: ClaudeMdTabProps) {
               onClick={() => onCopy(file.content || "", file.path)}
               style={{
                 padding: "6px 12px",
-                background: copiedPath === file.path ? "#2a9d8f" : "#264653",
+                background: copiedPath === file.path ? "var(--color-accent)" : "var(--color-bg-surface)",
                 border: "none",
                 borderRadius: "4px",
                 color: "white",
@@ -585,7 +585,7 @@ function ClaudeMdTab({ files, onCopy, copiedPath }: ClaudeMdTabProps) {
                     <code
                       className={className}
                       style={{
-                        background: "#264653",
+                        background: "var(--color-bg-surface)",
                         padding: "2px 6px",
                         borderRadius: "3px",
                         fontSize: "0.9em",
@@ -597,17 +597,17 @@ function ClaudeMdTab({ files, onCopy, copiedPath }: ClaudeMdTabProps) {
                   );
                 },
                 h1: ({ children }) => (
-                  <h1 style={{ color: "#2a9d8f", fontSize: "24px", marginBottom: "16px" }}>
+                  <h1 style={{ color: "var(--color-accent)", fontSize: "24px", marginBottom: "16px" }}>
                     {children}
                   </h1>
                 ),
                 h2: ({ children }) => (
-                  <h2 style={{ color: "#2a9d8f", fontSize: "20px", marginBottom: "12px", marginTop: "24px" }}>
+                  <h2 style={{ color: "var(--color-accent)", fontSize: "20px", marginBottom: "12px", marginTop: "24px" }}>
                     {children}
                   </h2>
                 ),
                 h3: ({ children }) => (
-                  <h3 style={{ color: "#2a9d8f", fontSize: "16px", marginBottom: "8px", marginTop: "16px" }}>
+                  <h3 style={{ color: "var(--color-accent)", fontSize: "16px", marginBottom: "8px", marginTop: "16px" }}>
                     {children}
                   </h3>
                 ),
@@ -621,7 +621,7 @@ function ClaudeMdTab({ files, onCopy, copiedPath }: ClaudeMdTabProps) {
                   <ol style={{ marginLeft: "20px", marginBottom: "12px" }}>{children}</ol>
                 ),
                 a: ({ children, href }) => (
-                  <a href={href} style={{ color: "#2a9d8f", textDecoration: "underline" }}>
+                  <a href={href} style={{ color: "var(--color-accent)", textDecoration: "underline" }}>
                     {children}
                   </a>
                 ),
@@ -666,7 +666,7 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
         <h3 style={{
           fontSize: "14px",
           fontWeight: 600,
-          color: "#2a9d8f",
+          color: "var(--color-accent)",
           marginBottom: "12px",
           textTransform: "uppercase",
           letterSpacing: "0.5px"
@@ -674,7 +674,7 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
           Configured Hooks
         </h3>
         {hooks.length === 0 ? (
-          <div style={{ color: "#a0a0a0", fontSize: "14px", padding: "12px", background: "#264653", borderRadius: "8px" }}>
+          <div style={{ color: "var(--color-text-secondary)", fontSize: "14px", padding: "12px", background: "var(--color-bg-surface)", borderRadius: "8px" }}>
             No hooks configured for this project.
           </div>
         ) : (
@@ -684,14 +684,14 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
                 key={hook.name}
                 style={{
                   padding: "16px",
-                  background: "#264653",
+                  background: "var(--color-bg-surface)",
                   borderRadius: "8px",
-                  border: "1px solid #2a9d8f",
+                  border: "1px solid var(--color-border-muted)",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: 600, color: "#2a9d8f" }}>
+                    <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-accent)" }}>
                       {hook.event}
                     </span>
                     <span
@@ -709,7 +709,7 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
                       style={{
                         fontSize: "11px",
                         padding: "2px 8px",
-                        background: hook.enabled ? "#2a9d8f" : "#666",
+                        background: hook.enabled ? "var(--color-accent)" : "#666",
                         borderRadius: "12px",
                         color: "white",
                       }}
@@ -721,10 +721,10 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
                     onClick={() => onCopy(hook.command, hook.name)}
                     style={{
                       padding: "4px 8px",
-                      background: "#1d3d47",
+                      background: "var(--color-bg-elevated)",
                       border: "none",
                       borderRadius: "4px",
-                      color: "#2a9d8f",
+                      color: "var(--color-accent)",
                       cursor: "pointer",
                       fontSize: "12px",
                     }}
@@ -738,7 +738,7 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
                     fontSize: "13px",
                     fontFamily: "monospace",
                     color: "#c0c0c0",
-                    background: "#1a1a1a",
+                    background: "var(--color-bg-base)",
                     padding: "8px",
                     borderRadius: "4px",
                   }}
@@ -756,7 +756,7 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
         <h3 style={{
           fontSize: "14px",
           fontWeight: 600,
-          color: "#2a9d8f",
+          color: "var(--color-accent)",
           marginBottom: "12px",
           textTransform: "uppercase",
           letterSpacing: "0.5px"
@@ -773,9 +773,9 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
               key={flag.name}
               style={{
                 padding: "12px",
-                background: "#264653",
+                background: "var(--color-bg-surface)",
                 borderRadius: "6px",
-                border: "1px solid #1d3d47",
+                border: "1px solid var(--color-bg-elevated)",
               }}
               data-testid={`cli-flag-${flag.name.replace(/^--/, '')}`}
             >
@@ -788,7 +788,7 @@ function HooksTab({ hooks, onCopy }: HooksTabProps) {
               }}>
                 {flag.name}
               </div>
-              <div style={{ fontSize: "12px", color: "#a0a0a0", lineHeight: 1.4 }}>
+              <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", lineHeight: 1.4 }}>
                 {flag.desc}
               </div>
             </div>
@@ -807,7 +807,7 @@ interface MCPTabProps {
 function MCPTab({ servers, onCopy }: MCPTabProps) {
   if (servers.length === 0) {
     return (
-      <div style={{ color: "#a0a0a0", fontSize: "14px" }}>
+      <div style={{ color: "var(--color-text-secondary)", fontSize: "14px" }}>
         No MCP servers configured for this project.
       </div>
     );
@@ -820,7 +820,7 @@ function MCPTab({ servers, onCopy }: MCPTabProps) {
           key={server.name}
           style={{
             padding: "16px",
-            background: "#264653",
+            background: "var(--color-bg-surface)",
             borderRadius: "8px",
             border: `1px solid ${getStatusColor(server.status)}`,
           }}
@@ -860,10 +860,10 @@ function MCPTab({ servers, onCopy }: MCPTabProps) {
               }
               style={{
                 padding: "4px 8px",
-                background: "#1d3d47",
+                background: "var(--color-bg-elevated)",
                 border: "none",
                 borderRadius: "4px",
-                color: "#2a9d8f",
+                color: "var(--color-accent)",
                 cursor: "pointer",
                 fontSize: "12px",
               }}
@@ -877,7 +877,7 @@ function MCPTab({ servers, onCopy }: MCPTabProps) {
               fontSize: "13px",
               fontFamily: "monospace",
               color: "#c0c0c0",
-              background: "#1a1a1a",
+              background: "var(--color-bg-base)",
               padding: "8px",
               borderRadius: "4px",
               marginBottom: "8px",
@@ -886,7 +886,7 @@ function MCPTab({ servers, onCopy }: MCPTabProps) {
             {server.command} {server.args?.join(" ")}
           </div>
           {server.env && Object.keys(server.env).length > 0 && (
-            <div style={{ fontSize: "12px", color: "#a0a0a0", marginTop: "8px" }}>
+            <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginTop: "8px" }}>
               <div style={{ fontWeight: 600, marginBottom: "4px" }}>Environment:</div>
               {Object.entries(server.env).map(([key, value]) => (
                 <div key={key} style={{ marginLeft: "8px", fontFamily: "monospace" }}>
@@ -927,14 +927,14 @@ function SettingsTab({ settings, onCopy }: SettingsTabProps) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-        <h3 style={{ fontSize: "16px", fontWeight: 600, color: "#2a9d8f" }}>
+        <h3 style={{ fontSize: "16px", fontWeight: 600, color: "var(--color-accent)" }}>
           Claude Settings
         </h3>
         <button
           onClick={() => onCopy(settingsJson, "settings")}
           style={{
             padding: "6px 12px",
-            background: "#264653",
+            background: "var(--color-bg-surface)",
             border: "none",
             borderRadius: "4px",
             color: "white",
@@ -973,7 +973,7 @@ function SettingsTab({ settings, onCopy }: SettingsTabProps) {
           />
         )}
         {Object.keys(settings).length === 0 && (
-          <div style={{ color: "#a0a0a0", fontSize: "14px" }}>
+          <div style={{ color: "var(--color-text-secondary)", fontSize: "14px" }}>
             No custom settings configured.
           </div>
         )}
@@ -993,18 +993,18 @@ function SettingItem({ label, value, multiline }: SettingItemProps) {
     <div
       style={{
         padding: "12px",
-        background: "#264653",
+        background: "var(--color-bg-surface)",
         borderRadius: "8px",
-        border: "1px solid #2a9d8f",
+        border: "1px solid var(--color-border-muted)",
       }}
     >
-      <div style={{ fontSize: "12px", color: "#a0a0a0", marginBottom: "6px" }}>
+      <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "6px" }}>
         {label}
       </div>
       <div
         style={{
           fontSize: "14px",
-          color: "#e8e8e8",
+          color: "var(--color-text-primary)",
           fontFamily: multiline ? "inherit" : "monospace",
           whiteSpace: multiline ? "pre-wrap" : "nowrap",
           overflow: multiline ? "auto" : "hidden",
@@ -1024,7 +1024,7 @@ function SettingItem({ label, value, multiline }: SettingItemProps) {
 function getStatusColor(status: string): string {
   switch (status) {
     case "connected":
-      return "#2a9d8f";
+      return "var(--color-accent)";
     case "connecting":
       return "#ff9800";
     case "error":

@@ -336,7 +336,9 @@ export function SkillsBrowser({ isOpen, onClose, workingDir = "." }: SkillsBrows
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
         zIndex: 1000,
         display: "flex",
         justifyContent: "center",
@@ -347,9 +349,12 @@ export function SkillsBrowser({ isOpen, onClose, workingDir = "." }: SkillsBrows
     >
       <div
         style={{
-          backgroundColor: "#1d3d47",
-          borderRadius: "12px",
-          border: "1px solid #2a9d8f",
+          backgroundColor: "var(--glass-bg)",
+          backdropFilter: "blur(var(--glass-blur))",
+          WebkitBackdropFilter: "blur(var(--glass-blur))",
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          boxShadow: "var(--shadow-xl)",
           maxWidth: showingDetails || showingConfig ? "1200px" : "1000px",
           width: "100%",
           maxHeight: "90vh",
@@ -388,7 +393,7 @@ export function SkillsBrowser({ isOpen, onClose, workingDir = "." }: SkillsBrows
         {/* Error Banner */}
         {error && (
           <div style={{
-            backgroundColor: "#e63946",
+            backgroundColor: "var(--color-error)",
             color: "white",
             padding: "12px 20px",
             display: "flex",
@@ -521,18 +526,18 @@ function SkillsBrowserHeader({
         alignItems: "center",
         justifyContent: "space-between",
         padding: "16px 20px",
-        borderBottom: "1px solid #2a9d8f",
+        borderBottom: "1px solid var(--color-border-muted)",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         <h2 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>
           Skills Browser
         </h2>
-        <span style={{ fontSize: "14px", color: "#a0a0a0" }}>
+        <span style={{ fontSize: "14px", color: "var(--color-text-secondary)" }}>
           {enabledCount} / {totalCount} active
         </span>
         {selectedCount > 0 && (
-          <span style={{ fontSize: "14px", color: "#2a9d8f" }}>
+          <span style={{ fontSize: "14px", color: "var(--color-accent)" }}>
             {selectedCount} selected
           </span>
         )}
@@ -540,14 +545,14 @@ function SkillsBrowserHeader({
 
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {/* View Mode Toggle */}
-        <div style={{ display: "flex", backgroundColor: "#264653", borderRadius: "6px", padding: "2px" }}>
+        <div style={{ display: "flex", backgroundColor: "var(--color-bg-surface)", borderRadius: "6px", padding: "2px" }}>
           <button
             onClick={() => onViewModeChange("grid")}
             style={{
               padding: "6px 12px",
               border: "none",
-              background: viewMode === "grid" ? "#2a9d8f" : "transparent",
-              color: "#e8e8e8",
+              background: viewMode === "grid" ? "var(--color-accent)" : "transparent",
+              color: "var(--color-text-primary)",
               borderRadius: "4px",
               cursor: "pointer",
               fontSize: "12px"
@@ -561,8 +566,8 @@ function SkillsBrowserHeader({
             style={{
               padding: "6px 12px",
               border: "none",
-              background: viewMode === "list" ? "#2a9d8f" : "transparent",
-              color: "#e8e8e8",
+              background: viewMode === "list" ? "var(--color-accent)" : "transparent",
+              color: "var(--color-text-primary)",
               borderRadius: "4px",
               cursor: "pointer",
               fontSize: "12px"
@@ -580,7 +585,7 @@ function SkillsBrowserHeader({
               onClick={onBulkActivate}
               style={{
                 padding: "6px 12px",
-                backgroundColor: "#2a9d8f",
+                backgroundColor: "var(--color-accent)",
                 border: "none",
                 borderRadius: "6px",
                 color: "white",
@@ -595,7 +600,7 @@ function SkillsBrowserHeader({
               onClick={onBulkDeactivate}
               style={{
                 padding: "6px 12px",
-                backgroundColor: "#e63946",
+                backgroundColor: "var(--color-error)",
                 border: "none",
                 borderRadius: "6px",
                 color: "white",
@@ -610,10 +615,10 @@ function SkillsBrowserHeader({
               onClick={onExport}
               style={{
                 padding: "6px 12px",
-                backgroundColor: "#264653",
-                border: "1px solid #2a9d8f",
+                backgroundColor: "var(--color-bg-surface)",
+                border: "1px solid var(--color-border-muted)",
                 borderRadius: "6px",
-                color: "#e8e8e8",
+                color: "var(--color-text-primary)",
                 cursor: "pointer",
                 fontSize: "12px"
               }}
@@ -629,10 +634,10 @@ function SkillsBrowserHeader({
           onClick={onImport}
           style={{
             padding: "6px 12px",
-            backgroundColor: "#264653",
-            border: "1px solid #2a9d8f",
+            backgroundColor: "var(--color-bg-surface)",
+            border: "1px solid var(--color-border-muted)",
             borderRadius: "6px",
-            color: "#e8e8e8",
+            color: "var(--color-text-primary)",
             cursor: "pointer",
             fontSize: "12px"
           }}
@@ -646,10 +651,10 @@ function SkillsBrowserHeader({
           onClick={onRefresh}
           style={{
             padding: "6px",
-            backgroundColor: "#264653",
-            border: "1px solid #2a9d8f",
+            backgroundColor: "var(--color-bg-surface)",
+            border: "1px solid var(--color-border-muted)",
             borderRadius: "6px",
-            color: "#e8e8e8",
+            color: "var(--color-text-primary)",
             cursor: "pointer"
           }}
           title="Refresh (Ctrl+R)"
@@ -664,7 +669,7 @@ function SkillsBrowserHeader({
             padding: "6px",
             backgroundColor: "transparent",
             border: "none",
-            color: "#a0a0a0",
+            color: "var(--color-text-secondary)",
             cursor: "pointer"
           }}
           title="Close (Esc)"
@@ -712,7 +717,7 @@ function SkillsBrowserFilters({
     <div
       style={{
         padding: "12px 20px",
-        borderBottom: "1px solid #2a9d8f",
+        borderBottom: "1px solid var(--color-border-muted)",
         display: "flex",
         gap: "12px",
         alignItems: "center",
@@ -730,10 +735,10 @@ function SkillsBrowserFilters({
           style={{
             width: "100%",
             padding: "8px 32px 8px 12px",
-            backgroundColor: "#264653",
-            border: "1px solid #2a9d8f",
+            backgroundColor: "var(--color-bg-surface)",
+            border: "1px solid var(--color-border-muted)",
             borderRadius: "6px",
-            color: "#e8e8e8",
+            color: "var(--color-text-primary)",
             fontSize: "14px",
           }}
         />
@@ -742,7 +747,7 @@ function SkillsBrowserFilters({
           right: "8px",
           top: "50%",
           transform: "translateY(-50%)",
-          color: "#a0a0a0"
+          color: "var(--color-text-secondary)"
         }}>
           <SearchIcon />
         </div>
@@ -758,10 +763,10 @@ function SkillsBrowserFilters({
         }
         style={{
           padding: "8px 12px",
-          backgroundColor: "#264653",
-          border: "1px solid #2a9d8f",
+          backgroundColor: "var(--color-bg-surface)",
+          border: "1px solid var(--color-border-muted)",
           borderRadius: "6px",
-          color: "#e8e8e8",
+          color: "var(--color-text-primary)",
           fontSize: "14px",
           cursor: "pointer",
         }}
@@ -791,10 +796,10 @@ function SkillsBrowserFilters({
         }
         style={{
           padding: "8px 12px",
-          backgroundColor: "#264653",
-          border: "1px solid #2a9d8f",
+          backgroundColor: "var(--color-bg-surface)",
+          border: "1px solid var(--color-border-muted)",
           borderRadius: "6px",
-          color: "#e8e8e8",
+          color: "var(--color-text-primary)",
           fontSize: "14px",
           cursor: "pointer",
         }}
@@ -810,7 +815,7 @@ function SkillsBrowserFilters({
           onClick={onClearFilter}
           style={{
             padding: "8px 12px",
-            backgroundColor: "#e63946",
+            backgroundColor: "var(--color-error)",
             border: "none",
             borderRadius: "6px",
             color: "white",
@@ -859,8 +864,8 @@ function SkillsGrid({
             key={skill.id}
             onClick={() => onSkillClick(skill)}
             style={{
-              backgroundColor: "#264653",
-              border: `2px solid ${isSelected ? "#e9c46a" : "#2a9d8f"}`,
+              backgroundColor: "var(--color-bg-surface)",
+              border: `2px solid ${isSelected ? "#e9c46a" : "var(--color-accent)"}`,
               borderRadius: "8px",
               padding: "16px",
               cursor: "pointer",
@@ -875,7 +880,7 @@ function SkillsGrid({
             }}
             onMouseLeave={(e) => {
               if (!isSelected) {
-                e.currentTarget.style.borderColor = "#2a9d8f";
+                e.currentTarget.style.borderColor = "var(--color-accent)";
               }
             }}
           >
@@ -909,7 +914,7 @@ function SkillsGrid({
                 fontSize: "16px",
                 fontWeight: 600,
                 marginBottom: "8px",
-                color: "#e8e8e8",
+                color: "var(--color-text-primary)",
               }}
             >
               {skill.name}
@@ -919,7 +924,7 @@ function SkillsGrid({
             <p
               style={{
                 fontSize: "13px",
-                color: "#a0a0a0",
+                color: "var(--color-text-secondary)",
                 marginBottom: "12px",
                 lineHeight: "1.4",
                 overflow: "hidden",
@@ -941,9 +946,9 @@ function SkillsGrid({
                     style={{
                       fontSize: "11px",
                       padding: "2px 8px",
-                      backgroundColor: "#1d3d47",
+                      backgroundColor: "var(--color-bg-elevated)",
                       borderRadius: "4px",
-                      color: "#2a9d8f",
+                      color: "var(--color-accent)",
                     }}
                   >
                     {tag}
@@ -960,7 +965,7 @@ function SkillsGrid({
                 alignItems: "center",
                 marginTop: "12px",
                 paddingTop: "12px",
-                borderTop: "1px solid #1d3d47",
+                borderTop: "1px solid var(--color-bg-elevated)",
               }}
             >
               <span
@@ -982,7 +987,7 @@ function SkillsGrid({
                   borderRadius: "10px",
                   border: "none",
                   cursor: "pointer",
-                  backgroundColor: isEnabled ? "#2a9d8f" : "#4b5563",
+                  backgroundColor: isEnabled ? "var(--color-accent)" : "#4b5563",
                   transition: "background-color 0.2s",
                 }}
                 role="switch"
@@ -1038,8 +1043,8 @@ function SkillsList({
             key={skill.id}
             onClick={() => onSkillClick(skill)}
             style={{
-              backgroundColor: "#264653",
-              border: `2px solid ${isSelected ? "#e9c46a" : "#2a9d8f"}`,
+              backgroundColor: "var(--color-bg-surface)",
+              border: `2px solid ${isSelected ? "#e9c46a" : "var(--color-accent)"}`,
               borderRadius: "8px",
               padding: "12px 16px",
               cursor: "pointer",
@@ -1056,7 +1061,7 @@ function SkillsList({
             }}
             onMouseLeave={(e) => {
               if (!isSelected) {
-                e.currentTarget.style.borderColor = "#2a9d8f";
+                e.currentTarget.style.borderColor = "var(--color-accent)";
               }
             }}
           >
@@ -1080,7 +1085,7 @@ function SkillsList({
                 style={{
                   fontSize: "15px",
                   fontWeight: 600,
-                  color: "#e8e8e8",
+                  color: "var(--color-text-primary)",
                   marginBottom: "4px",
                 }}
               >
@@ -1089,7 +1094,7 @@ function SkillsList({
               <div
                 style={{
                   fontSize: "13px",
-                  color: "#a0a0a0",
+                  color: "var(--color-text-secondary)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -1120,9 +1125,9 @@ function SkillsList({
                     style={{
                       fontSize: "11px",
                       padding: "2px 8px",
-                      backgroundColor: "#1d3d47",
+                      backgroundColor: "var(--color-bg-elevated)",
                       borderRadius: "4px",
-                      color: "#2a9d8f",
+                      color: "var(--color-accent)",
                     }}
                   >
                     {tag}
@@ -1141,7 +1146,7 @@ function SkillsList({
                 borderRadius: "10px",
                 border: "none",
                 cursor: "pointer",
-                backgroundColor: isEnabled ? "#2a9d8f" : "#4b5563",
+                backgroundColor: isEnabled ? "var(--color-accent)" : "#4b5563",
                 transition: "background-color 0.2s",
               }}
               role="switch"
@@ -1189,17 +1194,17 @@ function SkillDetailsPanel({
     <div
       style={{
         width: "400px",
-        borderLeft: "1px solid #2a9d8f",
+        borderLeft: "1px solid var(--color-border-muted)",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#1d3d47",
+        backgroundColor: "var(--color-bg-elevated)",
       }}
     >
       {/* Header */}
       <div
         style={{
           padding: "16px",
-          borderBottom: "1px solid #2a9d8f",
+          borderBottom: "1px solid var(--color-border-muted)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -1213,7 +1218,7 @@ function SkillDetailsPanel({
           style={{
             background: "none",
             border: "none",
-            color: "#a0a0a0",
+            color: "var(--color-text-secondary)",
             cursor: "pointer",
             padding: "4px",
           }}
@@ -1234,7 +1239,7 @@ function SkillDetailsPanel({
               fontSize: "20px",
               fontWeight: 600,
               marginBottom: "8px",
-              color: "#e8e8e8",
+              color: "var(--color-text-primary)",
             }}
           >
             {skill.name}
@@ -1256,7 +1261,7 @@ function SkillDetailsPanel({
               fontSize: "14px",
               fontWeight: 600,
               marginBottom: "8px",
-              color: "#e8e8e8",
+              color: "var(--color-text-primary)",
             }}
           >
             Description
@@ -1264,7 +1269,7 @@ function SkillDetailsPanel({
           <p
             style={{
               fontSize: "13px",
-              color: "#a0a0a0",
+              color: "var(--color-text-secondary)",
               lineHeight: "1.6",
             }}
           >
@@ -1280,7 +1285,7 @@ function SkillDetailsPanel({
                 fontSize: "14px",
                 fontWeight: 600,
                 marginBottom: "8px",
-                color: "#e8e8e8",
+                color: "var(--color-text-primary)",
               }}
             >
               Tags
@@ -1292,9 +1297,9 @@ function SkillDetailsPanel({
                   style={{
                     fontSize: "12px",
                     padding: "4px 10px",
-                    backgroundColor: "#264653",
+                    backgroundColor: "var(--color-bg-surface)",
                     borderRadius: "4px",
-                    color: "#2a9d8f",
+                    color: "var(--color-accent)",
                   }}
                 >
                   {tag}
@@ -1312,7 +1317,7 @@ function SkillDetailsPanel({
                 fontSize: "14px",
                 fontWeight: 600,
                 marginBottom: "8px",
-                color: "#e8e8e8",
+                color: "var(--color-text-primary)",
               }}
             >
               Documentation
@@ -1320,11 +1325,11 @@ function SkillDetailsPanel({
             <div
               style={{
                 fontSize: "13px",
-                color: "#a0a0a0",
+                color: "var(--color-text-secondary)",
                 lineHeight: "1.6",
                 maxHeight: "300px",
                 overflowY: "auto",
-                backgroundColor: "#264653",
+                backgroundColor: "var(--color-bg-surface)",
                 padding: "12px",
                 borderRadius: "6px",
               }}
@@ -1364,7 +1369,7 @@ function SkillDetailsPanel({
                 fontSize: "14px",
                 fontWeight: 600,
                 marginBottom: "8px",
-                color: "#e8e8e8",
+                color: "var(--color-text-primary)",
               }}
             >
               Parameters
@@ -1375,7 +1380,7 @@ function SkillDetailsPanel({
                   key={param.name}
                   style={{
                     padding: "8px",
-                    backgroundColor: "#264653",
+                    backgroundColor: "var(--color-bg-surface)",
                     borderRadius: "4px",
                   }}
                 >
@@ -1383,18 +1388,18 @@ function SkillDetailsPanel({
                     style={{
                       fontSize: "13px",
                       fontWeight: 500,
-                      color: "#e8e8e8",
+                      color: "var(--color-text-primary)",
                       marginBottom: "4px",
                     }}
                   >
                     {param.name}
                     {param.required && (
-                      <span style={{ color: "#e63946", marginLeft: "4px" }}>
+                      <span style={{ color: "var(--color-error)", marginLeft: "4px" }}>
                         *
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: "12px", color: "#a0a0a0" }}>
+                  <div style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
                     {param.description}
                   </div>
                   <div
@@ -1419,7 +1424,7 @@ function SkillDetailsPanel({
               fontSize: "14px",
               fontWeight: 600,
               marginBottom: "8px",
-              color: "#e8e8e8",
+              color: "var(--color-text-primary)",
             }}
           >
             Metadata
@@ -1427,7 +1432,7 @@ function SkillDetailsPanel({
           <div
             style={{
               fontSize: "12px",
-              color: "#a0a0a0",
+              color: "var(--color-text-secondary)",
               display: "flex",
               flexDirection: "column",
               gap: "4px",
@@ -1458,7 +1463,7 @@ function SkillDetailsPanel({
       <div
         style={{
           padding: "16px",
-          borderTop: "1px solid #2a9d8f",
+          borderTop: "1px solid var(--color-border-muted)",
           display: "flex",
           gap: "8px",
         }}
@@ -1469,7 +1474,7 @@ function SkillDetailsPanel({
             style={{
               flex: 1,
               padding: "10px",
-              backgroundColor: "#2a9d8f",
+              backgroundColor: "var(--color-accent)",
               border: "none",
               borderRadius: "6px",
               color: "white",
@@ -1486,7 +1491,7 @@ function SkillDetailsPanel({
           style={{
             flex: 1,
             padding: "10px",
-            backgroundColor: isEnabled ? "#e63946" : "#2a9d8f",
+            backgroundColor: isEnabled ? "var(--color-error)" : "var(--color-accent)",
             border: "none",
             borderRadius: "6px",
             color: "white",
@@ -1527,17 +1532,17 @@ function SkillConfigPanel({
     <div
       style={{
         width: "400px",
-        borderLeft: "1px solid #2a9d8f",
+        borderLeft: "1px solid var(--color-border-muted)",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#1d3d47",
+        backgroundColor: "var(--color-bg-elevated)",
       }}
     >
       {/* Header */}
       <div
         style={{
           padding: "16px",
-          borderBottom: "1px solid #2a9d8f",
+          borderBottom: "1px solid var(--color-border-muted)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -1551,7 +1556,7 @@ function SkillConfigPanel({
           style={{
             background: "none",
             border: "none",
-            color: "#a0a0a0",
+            color: "var(--color-text-secondary)",
             cursor: "pointer",
             padding: "4px",
           }}
@@ -1565,7 +1570,7 @@ function SkillConfigPanel({
         <div
           style={{
             padding: "12px 16px",
-            backgroundColor: "#e63946",
+            backgroundColor: "var(--color-error)",
             color: "white",
             fontSize: "13px",
           }}
@@ -1589,18 +1594,18 @@ function SkillConfigPanel({
                 fontSize: "13px",
                 fontWeight: 500,
                 marginBottom: "6px",
-                color: "#e8e8e8",
+                color: "var(--color-text-primary)",
               }}
             >
               {param.name}
               {param.required && (
-                <span style={{ color: "#e63946", marginLeft: "4px" }}>*</span>
+                <span style={{ color: "var(--color-error)", marginLeft: "4px" }}>*</span>
               )}
             </label>
             <div
               style={{
                 fontSize: "12px",
-                color: "#a0a0a0",
+                color: "var(--color-text-secondary)",
                 marginBottom: "8px",
               }}
             >
@@ -1617,10 +1622,10 @@ function SkillConfigPanel({
                 style={{
                   width: "100%",
                   padding: "8px 12px",
-                  backgroundColor: "#264653",
-                  border: "1px solid #2a9d8f",
+                  backgroundColor: "var(--color-bg-surface)",
+                  border: "1px solid var(--color-border-muted)",
                   borderRadius: "6px",
-                  color: "#e8e8e8",
+                  color: "var(--color-text-primary)",
                   fontSize: "14px",
                   boxSizing: "border-box",
                 }}
@@ -1638,10 +1643,10 @@ function SkillConfigPanel({
                 style={{
                   width: "100%",
                   padding: "8px 12px",
-                  backgroundColor: "#264653",
-                  border: "1px solid #2a9d8f",
+                  backgroundColor: "var(--color-bg-surface)",
+                  border: "1px solid var(--color-border-muted)",
                   borderRadius: "6px",
-                  color: "#e8e8e8",
+                  color: "var(--color-text-primary)",
                   fontSize: "14px",
                   boxSizing: "border-box",
                 }}
@@ -1661,7 +1666,7 @@ function SkillConfigPanel({
                   border: "none",
                   cursor: "pointer",
                   backgroundColor: parameters[param.name]
-                    ? "#2a9d8f"
+                    ? "var(--color-accent)"
                     : "#4b5563",
                   transition: "background-color 0.2s",
                 }}
@@ -1690,10 +1695,10 @@ function SkillConfigPanel({
                 style={{
                   width: "100%",
                   padding: "8px 12px",
-                  backgroundColor: "#264653",
-                  border: "1px solid #2a9d8f",
+                  backgroundColor: "var(--color-bg-surface)",
+                  border: "1px solid var(--color-border-muted)",
                   borderRadius: "6px",
-                  color: "#e8e8e8",
+                  color: "var(--color-text-primary)",
                   fontSize: "14px",
                   cursor: "pointer",
                 }}
@@ -1714,7 +1719,7 @@ function SkillConfigPanel({
       <div
         style={{
           padding: "16px",
-          borderTop: "1px solid #2a9d8f",
+          borderTop: "1px solid var(--color-border-muted)",
           display: "flex",
           gap: "8px",
         }}
@@ -1724,10 +1729,10 @@ function SkillConfigPanel({
           style={{
             flex: 1,
             padding: "10px",
-            backgroundColor: "#264653",
-            border: "1px solid #2a9d8f",
+            backgroundColor: "var(--color-bg-surface)",
+            border: "1px solid var(--color-border-muted)",
             borderRadius: "6px",
-            color: "#e8e8e8",
+            color: "var(--color-text-primary)",
             cursor: "pointer",
             fontSize: "14px",
           }}
@@ -1739,7 +1744,7 @@ function SkillConfigPanel({
           style={{
             flex: 1,
             padding: "10px",
-            backgroundColor: "#2a9d8f",
+            backgroundColor: "var(--color-accent)",
             border: "none",
             borderRadius: "6px",
             color: "white",
@@ -1770,9 +1775,9 @@ function SkillsBrowserFooter({
     <div
       style={{
         padding: "12px 20px",
-        borderTop: "1px solid #2a9d8f",
+        borderTop: "1px solid var(--color-border-muted)",
         fontSize: "12px",
-        color: "#a0a0a0",
+        color: "var(--color-text-secondary)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -1786,7 +1791,7 @@ function SkillsBrowserFooter({
         <kbd
           style={{
             padding: "2px 6px",
-            backgroundColor: "#264653",
+            backgroundColor: "var(--color-bg-surface)",
             borderRadius: "3px",
             color: "#e9c46a",
             marginLeft: "8px",
@@ -1798,7 +1803,7 @@ function SkillsBrowserFooter({
         <kbd
           style={{
             padding: "2px 6px",
-            backgroundColor: "#264653",
+            backgroundColor: "var(--color-bg-surface)",
             borderRadius: "3px",
             color: "#e9c46a",
             marginLeft: "8px",
@@ -1824,15 +1829,15 @@ function LoadingSpinner() {
         justifyContent: "center",
         alignItems: "center",
         height: "200px",
-        color: "#a0a0a0",
+        color: "var(--color-text-secondary)",
       }}
     >
       <div
         style={{
           width: "40px",
           height: "40px",
-          border: "4px solid #264653",
-          borderTop: "4px solid #2a9d8f",
+          border: "4px solid var(--color-bg-surface)",
+          borderTop: "4px solid var(--color-accent)",
           borderRadius: "50%",
           animation: "spin 1s linear infinite",
         }}
@@ -1858,7 +1863,7 @@ function EmptyState() {
         justifyContent: "center",
         alignItems: "center",
         height: "200px",
-        color: "#a0a0a0",
+        color: "var(--color-text-secondary)",
         textAlign: "center",
       }}
     >

@@ -60,7 +60,13 @@ function ReadCardComponent({
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-3 py-2 bg-tertiary border-b border-default cursor-pointer hover:bg-tertiary/80"
+        className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderColor: 'var(--color-border-default)',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)'}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -143,7 +149,7 @@ function ReadCardComponent({
 
       {/* Preview line when collapsed */}
       {!isExpanded && content && (
-        <div style={{ color: '#a0a0a0', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: '#0d1117' }}>
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: 'var(--color-bg-base)' }}>
           {content.split('\n')[0].substring(0, 80)}{content.length > 80 || content.includes('\n') ? '...' : ''}
         </div>
       )}

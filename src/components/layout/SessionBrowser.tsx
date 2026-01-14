@@ -391,12 +391,14 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
-        color: "#e8e8e8",
+        color: "var(--color-text-primary)",
       }}
       onClick={onClose}
       data-testid="session-browser-backdrop"
@@ -406,9 +408,12 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
           width: "90%",
           maxWidth: "1200px",
           height: "80%",
-          backgroundColor: "#1d3d47",
-          borderRadius: "12px",
-          border: "1px solid #2a9d8f",
+          backgroundColor: "var(--glass-bg)",
+          backdropFilter: "blur(var(--glass-blur))",
+          WebkitBackdropFilter: "blur(var(--glass-blur))",
+          borderRadius: "var(--radius-lg)",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          boxShadow: "var(--shadow-xl)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -419,7 +424,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
         <div
           style={{
             padding: "16px 24px",
-            borderBottom: "1px solid #2a9d8f",
+            borderBottom: "1px solid var(--color-border-muted)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -435,9 +440,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
               style={{
                 padding: "6px 12px",
                 borderRadius: "6px",
-                border: "1px solid #2a9d8f",
-                backgroundColor: "#264653",
-                color: "#e8e8e8",
+                border: "1px solid var(--color-border-muted)",
+                backgroundColor: "var(--color-bg-surface)",
+                color: "var(--color-text-primary)",
                 fontSize: "14px",
                 cursor: "pointer",
               }}
@@ -453,9 +458,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                 style={{
                   padding: "6px 12px",
                   borderRadius: "6px",
-                  border: "1px solid #2a9d8f",
-                  backgroundColor: "#264653",
-                  color: "#e8e8e8",
+                  border: "1px solid var(--color-border-muted)",
+                  backgroundColor: "var(--color-bg-surface)",
+                  color: "var(--color-text-primary)",
                   fontSize: "14px",
                   cursor: "pointer",
                 }}
@@ -471,9 +476,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
               style={{
                 padding: "6px 12px",
                 borderRadius: "6px",
-                border: "1px solid #2a9d8f",
-                backgroundColor: showFilters ? "#2a9d8f" : "#264653",
-                color: "#e8e8e8",
+                border: "1px solid var(--color-border-muted)",
+                backgroundColor: showFilters ? "var(--color-accent)" : "var(--color-bg-surface)",
+                color: "var(--color-text-primary)",
                 fontSize: "14px",
                 cursor: "pointer",
               }}
@@ -489,8 +494,8 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                 padding: "6px 12px",
                 borderRadius: "6px",
                 border: "none",
-                backgroundColor: "#264653",
-                color: "#e8e8e8",
+                backgroundColor: "var(--color-bg-surface)",
+                color: "var(--color-text-primary)",
                 fontSize: "14px",
                 cursor: "pointer",
               }}
@@ -503,7 +508,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
         </div>
 
         {/* Search bar */}
-        <div style={{ padding: "16px 24px", borderBottom: "1px solid #2a9d8f" }}>
+        <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--color-border-muted)" }}>
           <input
             type="text"
             placeholder="Search sessions..."
@@ -513,9 +518,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
               width: "100%",
               padding: "8px 12px",
               borderRadius: "6px",
-              border: "1px solid #2a9d8f",
-              backgroundColor: "#264653",
-              color: "#e8e8e8",
+              border: "1px solid var(--color-border-muted)",
+              backgroundColor: "var(--color-bg-surface)",
+              color: "var(--color-text-primary)",
               fontSize: "14px",
               outline: "none",
             }}
@@ -528,8 +533,8 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
           <div
             style={{
               padding: "16px 24px",
-              borderBottom: "1px solid #2a9d8f",
-              backgroundColor: "#264653",
+              borderBottom: "1px solid var(--color-border-muted)",
+              backgroundColor: "var(--color-bg-surface)",
             }}
           >
             <div
@@ -541,7 +546,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
             >
               {/* Sort */}
               <div>
-                <label style={{ fontSize: "12px", color: "#a0a0a0" }}>
+                <label style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
                   Sort by
                 </label>
                 <select
@@ -551,9 +556,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                     width: "100%",
                     padding: "6px",
                     borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#1d3d47",
-                    color: "#e8e8e8",
+                    border: "1px solid var(--color-border-muted)",
+                    backgroundColor: "var(--color-bg-elevated)",
+                    color: "var(--color-text-primary)",
                     fontSize: "14px",
                   }}
                   data-testid="sort-by-select"
@@ -567,7 +572,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
 
               {/* Order */}
               <div>
-                <label style={{ fontSize: "12px", color: "#a0a0a0" }}>
+                <label style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
                   Order
                 </label>
                 <select
@@ -577,9 +582,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                     width: "100%",
                     padding: "6px",
                     borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#1d3d47",
-                    color: "#e8e8e8",
+                    border: "1px solid var(--color-border-muted)",
+                    backgroundColor: "var(--color-bg-elevated)",
+                    color: "var(--color-text-primary)",
                     fontSize: "14px",
                   }}
                   data-testid="sort-order-select"
@@ -591,7 +596,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
 
               {/* Min cost */}
               <div>
-                <label style={{ fontSize: "12px", color: "#a0a0a0" }}>
+                <label style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
                   Min cost ($)
                 </label>
                 <input
@@ -608,9 +613,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                     width: "100%",
                     padding: "6px",
                     borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#1d3d47",
-                    color: "#e8e8e8",
+                    border: "1px solid var(--color-border-muted)",
+                    backgroundColor: "var(--color-bg-elevated)",
+                    color: "var(--color-text-primary)",
                     fontSize: "14px",
                   }}
                   data-testid="min-cost-input"
@@ -619,7 +624,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
 
               {/* Max cost */}
               <div>
-                <label style={{ fontSize: "12px", color: "#a0a0a0" }}>
+                <label style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>
                   Max cost ($)
                 </label>
                 <input
@@ -636,9 +641,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                     width: "100%",
                     padding: "6px",
                     borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#1d3d47",
-                    color: "#e8e8e8",
+                    border: "1px solid var(--color-border-muted)",
+                    backgroundColor: "var(--color-bg-elevated)",
+                    color: "var(--color-text-primary)",
                     fontSize: "14px",
                   }}
                   data-testid="max-cost-input"
@@ -652,9 +657,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                 marginTop: "12px",
                 padding: "6px 12px",
                 borderRadius: "6px",
-                border: "1px solid #2a9d8f",
-                backgroundColor: "#1d3d47",
-                color: "#e8e8e8",
+                border: "1px solid var(--color-border-muted)",
+                backgroundColor: "var(--color-bg-elevated)",
+                color: "var(--color-text-primary)",
                 fontSize: "14px",
                 cursor: "pointer",
               }}
@@ -679,11 +684,11 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
             data-testid="session-list"
           >
             {loading ? (
-              <div style={{ textAlign: "center", padding: "40px", color: "#a0a0a0" }}>
+              <div style={{ textAlign: "center", padding: "40px", color: "var(--color-text-secondary)" }}>
                 Loading sessions...
               </div>
             ) : filteredSessions.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "40px", color: "#a0a0a0" }}>
+              <div style={{ textAlign: "center", padding: "40px", color: "var(--color-text-secondary)" }}>
                 No sessions found
               </div>
             ) : (
@@ -715,8 +720,8 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                         style={{
                           padding: "12px",
                           borderRadius: "8px",
-                          backgroundColor: isSelected ? "#264653" : "#1d3d47",
-                          border: `1px solid ${isSelected ? "#2a9d8f" : "#264653"}`,
+                          backgroundColor: isSelected ? "var(--color-bg-surface)" : "var(--color-bg-elevated)",
+                          border: `1px solid ${isSelected ? "var(--color-accent)" : "var(--color-bg-surface)"}`,
                           cursor: "pointer",
                           marginBottom: "8px",
                           display: "flex",
@@ -763,7 +768,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                           <div
                             style={{
                               fontSize: "12px",
-                              color: "#a0a0a0",
+                              color: "var(--color-text-secondary)",
                               marginBottom: "4px",
                             }}
                           >
@@ -794,9 +799,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                             style={{
                               padding: "4px 8px",
                               borderRadius: "4px",
-                              border: "1px solid #2a9d8f",
-                              backgroundColor: "#264653",
-                              color: "#e8e8e8",
+                              border: "1px solid var(--color-border-muted)",
+                              backgroundColor: "var(--color-bg-surface)",
+                              color: "var(--color-text-primary)",
                               fontSize: "12px",
                               cursor: "pointer",
                             }}
@@ -810,9 +815,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                             style={{
                               padding: "4px 8px",
                               borderRadius: "4px",
-                              border: "1px solid #2a9d8f",
-                              backgroundColor: "#2a9d8f",
-                              color: "#e8e8e8",
+                              border: "1px solid var(--color-border-muted)",
+                              backgroundColor: "var(--color-accent)",
+                              color: "var(--color-text-primary)",
                               fontSize: "12px",
                               cursor: "pointer",
                             }}
@@ -825,9 +830,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                             style={{
                               padding: "4px 8px",
                               borderRadius: "4px",
-                              border: "1px solid #2a9d8f",
-                              backgroundColor: "#264653",
-                              color: "#e8e8e8",
+                              border: "1px solid var(--color-border-muted)",
+                              backgroundColor: "var(--color-bg-surface)",
+                              color: "var(--color-text-primary)",
                               fontSize: "12px",
                               cursor: "pointer",
                             }}
@@ -841,7 +846,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                               padding: "4px 8px",
                               borderRadius: "4px",
                               border: "1px solid #e76f51",
-                              backgroundColor: "#264653",
+                              backgroundColor: "var(--color-bg-surface)",
                               color: "#e76f51",
                               fontSize: "12px",
                               cursor: "pointer",
@@ -865,10 +870,10 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
             <div
               style={{
                 width: "400px",
-                borderLeft: "1px solid #2a9d8f",
+                borderLeft: "1px solid var(--color-border-muted)",
                 padding: "16px",
                 overflowY: "auto",
-                backgroundColor: "#264653",
+                backgroundColor: "var(--color-bg-surface)",
               }}
               data-testid="preview-panel"
             >
@@ -880,7 +885,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                 <strong>{previewSession.title}</strong>
               </div>
 
-              <div style={{ fontSize: "12px", color: "#a0a0a0", marginBottom: "16px" }}>
+              <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "16px" }}>
                 <div>Project: {previewSession.workingDir}</div>
                 <div>Model: {previewSession.model}</div>
                 <div>
@@ -894,7 +899,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
 
               {previewSession.tags.length > 0 && (
                 <div style={{ marginBottom: "16px" }}>
-                  <div style={{ fontSize: "12px", color: "#a0a0a0", marginBottom: "4px" }}>
+                  <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "4px" }}>
                     Tags:
                   </div>
                   <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
@@ -904,9 +909,9 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                         style={{
                           padding: "2px 8px",
                           borderRadius: "12px",
-                          backgroundColor: "#1d3d47",
+                          backgroundColor: "var(--color-bg-elevated)",
                           fontSize: "11px",
-                          color: "#2a9d8f",
+                          color: "var(--color-accent)",
                         }}
                       >
                         {tag}
@@ -917,7 +922,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
               )}
 
               <div>
-                <div style={{ fontSize: "12px", color: "#a0a0a0", marginBottom: "8px" }}>
+                <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "8px" }}>
                   First 3 messages:
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -927,7 +932,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                       style={{
                         padding: "8px",
                         borderRadius: "6px",
-                        backgroundColor: "#1d3d47",
+                        backgroundColor: "var(--color-bg-elevated)",
                         fontSize: "12px",
                       }}
                     >
@@ -935,7 +940,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
                         style={{
                           fontWeight: 600,
                           marginBottom: "4px",
-                          color: entry.role === "user" ? "#e9c46a" : "#2a9d8f",
+                          color: entry.role === "user" ? "#e9c46a" : "var(--color-accent)",
                         }}
                       >
                         {entry.role === "user" ? "User" : "Claude"}
@@ -968,12 +973,12 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
         <div
           style={{
             padding: "12px 24px",
-            borderTop: "1px solid #2a9d8f",
+            borderTop: "1px solid var(--color-border-muted)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             fontSize: "12px",
-            color: "#a0a0a0",
+            color: "var(--color-text-secondary)",
           }}
         >
           <div>
@@ -985,7 +990,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
               style={{
                 padding: "2px 6px",
                 borderRadius: "4px",
-                backgroundColor: "#264653",
+                backgroundColor: "var(--color-bg-surface)",
                 marginRight: "4px",
               }}
             >
@@ -996,7 +1001,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
               style={{
                 padding: "2px 6px",
                 borderRadius: "4px",
-                backgroundColor: "#264653",
+                backgroundColor: "var(--color-bg-surface)",
                 marginLeft: "12px",
                 marginRight: "4px",
               }}
@@ -1008,7 +1013,7 @@ export function SessionBrowser({ isOpen, onClose }: SessionBrowserProps) {
               style={{
                 padding: "2px 6px",
                 borderRadius: "4px",
-                backgroundColor: "#264653",
+                backgroundColor: "var(--color-bg-surface)",
                 marginLeft: "12px",
                 marginRight: "4px",
               }}

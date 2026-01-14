@@ -124,7 +124,13 @@ function EditCardComponent({
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-3 py-2 bg-tertiary border-b border-default cursor-pointer hover:bg-tertiary/80"
+        className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderColor: 'var(--color-border-default)',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)'}
         onClick={() => setIsExpanded(!isExpanded)}
         data-testid="edit-card-header"
       >
@@ -185,7 +191,8 @@ function EditCardComponent({
           {isPending && (
             <>
               <button
-                className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700 rounded transition-colors disabled:opacity-50"
+                className="px-2 py-1 text-xs rounded transition-colors disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-success)', color: 'white' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleAccept();
@@ -196,7 +203,8 @@ function EditCardComponent({
                 {isApplying ? "..." : "Accept"}
               </button>
               <button
-                className="px-2 py-1 text-xs bg-red-600 hover:bg-red-700 rounded transition-colors disabled:opacity-50"
+                className="px-2 py-1 text-xs rounded transition-colors disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-error)', color: 'white' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleReject();
@@ -244,7 +252,7 @@ function EditCardComponent({
 
       {/* Preview line when collapsed */}
       {!isExpanded && pendingEdit?.diff && (
-        <div style={{ color: '#a0a0a0', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: '#0d1117' }}>
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: '12px', padding: '4px 12px 8px', fontFamily: 'monospace', backgroundColor: 'var(--color-bg-base)' }}>
           {pendingEdit.diff.split('\n').find(line => line.startsWith('+') && !line.startsWith('+++'))?.substring(0, 80) ||
            pendingEdit.diff.split('\n').find(line => line.startsWith('-') && !line.startsWith('---'))?.substring(0, 80) ||
            'Changes pending...'}
@@ -372,16 +380,34 @@ function ConflictModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in"
+      className="fixed inset-0 flex items-center justify-center z-50 animate-fade-in"
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+      }}
       onClick={onClose}
       data-testid="conflict-modal"
     >
       <div
-        className="bg-secondary border border-red-500/50 rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden"
+        className="rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden"
+        style={{
+          backgroundColor: 'var(--glass-bg)',
+          backdropFilter: 'blur(var(--glass-blur))',
+          WebkitBackdropFilter: 'blur(var(--glass-blur))',
+          border: '1px solid var(--color-error)',
+          boxShadow: 'var(--shadow-xl)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-red-500/50 bg-red-900/20">
+        <div
+          className="flex items-center justify-between px-4 py-3"
+          style={{
+            borderBottom: '1px solid var(--color-error)',
+            backgroundColor: 'rgba(248, 81, 73, 0.1)',
+          }}
+        >
           <div className="flex items-center gap-2">
             <svg
               className="w-6 h-6 text-red-400"
@@ -427,8 +453,8 @@ function ConflictModal({
           {/* Three-way diff preview */}
           <div className="space-y-3">
             {/* Base content */}
-            <div className="border border-default rounded">
-              <div className="px-3 py-2 bg-tertiary border-b border-default">
+            <div className="rounded" style={{ border: '1px solid var(--color-border-default)' }}>
+              <div className="px-3 py-2" style={{ backgroundColor: 'var(--color-bg-surface)', borderBottom: '1px solid var(--color-border-default)' }}>
                 <span className="text-xs font-medium text-muted">
                   Base (Original)
                 </span>
@@ -464,7 +490,7 @@ function ConflictModal({
           </div>
 
           {/* Instructions */}
-          <div className="mt-4 p-3 bg-tertiary rounded border border-default">
+          <div className="mt-4 p-3 rounded" style={{ backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)' }}>
             <h4 className="text-sm font-medium text-primary mb-2">
               Resolution Steps:
             </h4>
@@ -478,16 +504,18 @@ function ConflictModal({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-default bg-tertiary">
+        <div className="flex items-center justify-end gap-2 px-4 py-3" style={{ borderTop: '1px solid var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}>
           <button
-            className="px-4 py-2 text-sm bg-primary hover:bg-primary/80 rounded transition-colors"
+            className="px-4 py-2 text-sm rounded transition-colors"
+            style={{ backgroundColor: 'var(--color-bg-overlay)', color: 'var(--color-text-primary)' }}
             onClick={handleOpenInEditor}
             data-testid="open-in-editor"
           >
             Open in Editor
           </button>
           <button
-            className="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 rounded transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm rounded transition-colors disabled:opacity-50"
+            style={{ backgroundColor: 'var(--color-success)', color: 'white' }}
             onClick={handleManualResolve}
             disabled={isResolving}
             data-testid="mark-resolved"
