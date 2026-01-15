@@ -49,11 +49,11 @@ interface MCPServerListItemProps {
 
 function MCPServerListItem({ server, isExpanded, onToggleExpand }: MCPServerListItemProps) {
   const statusColors = {
-    connected: "#2a9d8f",
-    connecting: "#f39c12",
-    error: "#e74c3c",
-    stopped: "#6b6b6b",
-    disabled: "#4b5563",
+    connected: "var(--color-success)",
+    connecting: "var(--color-warning)",
+    error: "var(--color-error)",
+    stopped: "var(--color-text-muted)",
+    disabled: "var(--color-text-muted)",
   };
 
   const statusLabels = {
@@ -68,14 +68,14 @@ function MCPServerListItem({ server, isExpanded, onToggleExpand }: MCPServerList
     <div
       style={{
         padding: "8px",
-        backgroundColor: "#264653",
-        borderRadius: "6px",
+        backgroundColor: "var(--color-bg-overlay)",
+        borderRadius: "var(--radius-md)",
         cursor: "pointer",
-        transition: "background-color 0.2s",
+        transition: "var(--transition-fast)",
       }}
       onClick={onToggleExpand}
-      onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#2d5561"}
-      onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#264653"}
+      onMouseOver={(e) => e.currentTarget.style.backgroundColor = "var(--color-bg-elevated)"}
+      onMouseOut={(e) => e.currentTarget.style.backgroundColor = "var(--color-bg-overlay)"}
     >
       <div style={{
         display: "flex",
@@ -109,7 +109,7 @@ function MCPServerListItem({ server, isExpanded, onToggleExpand }: MCPServerList
             </div>
             <div style={{
               fontSize: "11px",
-              color: "#a0a0a0",
+              color: "var(--color-text-secondary)",
               display: "flex",
               alignItems: "center",
               gap: "4px",
@@ -131,8 +131,8 @@ function MCPServerListItem({ server, isExpanded, onToggleExpand }: MCPServerList
             width: "16px",
             height: "16px",
             transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-            transition: "transform 0.2s",
-            color: "#a0a0a0",
+            transition: "transform var(--transition-fast)",
+            color: "var(--color-text-secondary)",
             flexShrink: 0,
           }}
           fill="none"
@@ -153,10 +153,10 @@ function MCPServerListItem({ server, isExpanded, onToggleExpand }: MCPServerList
         <div style={{
           marginTop: "8px",
           padding: "6px 8px",
-          backgroundColor: "rgba(231, 76, 60, 0.1)",
-          borderRadius: "4px",
+          backgroundColor: "rgba(var(--color-error), 0.1)",
+          borderRadius: "var(--radius-sm)",
           fontSize: "11px",
-          color: "#e74c3c",
+          color: "var(--color-error)",
         }}>
           {server.error}
         </div>

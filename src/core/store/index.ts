@@ -28,7 +28,7 @@ interface SessionsState {
 
 interface UIState {
   sidebarOpen: boolean;
-  theme: "dark" | "light";
+  theme: "dark" | "light" | "system";
 }
 
 interface SettingsState {
@@ -61,7 +61,7 @@ interface RootState extends SessionsState, UIState, SettingsState {
 
   // UI actions
   toggleSidebar: () => void;
-  setTheme: (theme: "dark" | "light") => void;
+  setTheme: (theme: "dark" | "light" | "system") => void;
 
   // Settings actions
   setYoloMode: (enabled: boolean) => void;
@@ -242,7 +242,7 @@ export const useStore = create<RootState>()(
             })
           ),
 
-        setTheme: (theme: "dark" | "light") =>
+        setTheme: (theme: "dark" | "light" | "system") =>
           set(
             produce((state: RootState) => {
               state.theme = theme;

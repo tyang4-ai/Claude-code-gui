@@ -135,21 +135,22 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
     >
       <div
         style={{
-          backgroundColor: "#1d3d47",
-          borderRadius: "8px",
+          backgroundColor: "var(--color-bg-surface)",
+          borderRadius: "var(--radius-lg)",
           width: "90%",
           maxWidth: "500px",
           maxHeight: "90vh",
           display: "flex",
           flexDirection: "column",
-          color: "#e8e8e8",
+          color: "var(--color-text-primary)",
+          boxShadow: "var(--shadow-xl)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div style={{
           padding: "16px",
-          borderBottom: "1px solid #2a9d8f",
+          borderBottom: "1px solid var(--color-border-default)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -162,16 +163,19 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
             style={{
               background: "none",
               border: "none",
-              color: "#a0a0a0",
+              color: "var(--color-text-secondary)",
               cursor: "pointer",
               fontSize: "20px",
               padding: "0",
               width: "24px",
               height: "24px",
+              transition: "var(--transition-fast)",
             }}
+            onMouseOver={(e) => e.currentTarget.style.color = "var(--color-text-primary)"}
+            onMouseOut={(e) => e.currentTarget.style.color = "var(--color-text-secondary)"}
             aria-label="Close"
           >
-            ×
+            x
           </button>
         </div>
 
@@ -182,9 +186,9 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
             <div style={{
               marginBottom: "16px",
               padding: "12px",
-              backgroundColor: "rgba(231, 76, 60, 0.1)",
-              borderRadius: "6px",
-              color: "#e74c3c",
+              backgroundColor: "rgba(248, 81, 73, 0.1)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--color-error)",
               fontSize: "12px",
             }}>
               {errors.map((error, i) => (
@@ -195,7 +199,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
 
           {/* Server Name */}
           <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
               Server Name *
             </label>
             <input
@@ -207,21 +211,21 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
               style={{
                 width: "100%",
                 padding: "8px",
-                borderRadius: "4px",
-                border: "1px solid #2a9d8f",
-                backgroundColor: "#264653",
-                color: "#e8e8e8",
+                borderRadius: "var(--radius-sm)",
+                border: "1px solid var(--color-border-default)",
+                backgroundColor: "var(--color-bg-overlay)",
+                color: "var(--color-text-primary)",
                 fontSize: "13px",
               }}
             />
-            <div style={{ fontSize: "11px", color: "#6b6b6b", marginTop: "4px" }}>
+            <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginTop: "4px" }}>
               Alphanumeric characters, hyphens, and underscores only
             </div>
           </div>
 
           {/* Transport */}
           <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
               Transport *
             </label>
             <div style={{ display: "flex", gap: "8px" }}>
@@ -233,14 +237,15 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
                   style={{
                     flex: 1,
                     padding: "8px",
-                    borderRadius: "4px",
-                    border: transport === t ? "2px solid #2a9d8f" : "1px solid #4b5563",
-                    backgroundColor: transport === t ? "#264653" : "transparent",
-                    color: transport === t ? "#2a9d8f" : "#a0a0a0",
+                    borderRadius: "var(--radius-sm)",
+                    border: transport === t ? "2px solid var(--color-accent)" : "1px solid var(--color-border-default)",
+                    backgroundColor: transport === t ? "rgba(130, 230, 190, 0.15)" : "transparent",
+                    color: transport === t ? "var(--color-accent)" : "var(--color-text-secondary)",
                     fontSize: "12px",
                     fontWeight: 500,
                     cursor: "pointer",
                     textTransform: "uppercase",
+                    transition: "var(--transition-fast)",
                   }}
                 >
                   {t}
@@ -251,7 +256,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
 
           {/* Scope */}
           <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
               Scope *
             </label>
             <div style={{ display: "flex", gap: "8px" }}>
@@ -263,21 +268,22 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
                   style={{
                     flex: 1,
                     padding: "8px",
-                    borderRadius: "4px",
-                    border: scope === s ? "2px solid #2a9d8f" : "1px solid #4b5563",
-                    backgroundColor: scope === s ? "#264653" : "transparent",
-                    color: scope === s ? "#2a9d8f" : "#a0a0a0",
+                    borderRadius: "var(--radius-sm)",
+                    border: scope === s ? "2px solid var(--color-accent)" : "1px solid var(--color-border-default)",
+                    backgroundColor: scope === s ? "rgba(130, 230, 190, 0.15)" : "transparent",
+                    color: scope === s ? "var(--color-accent)" : "var(--color-text-secondary)",
                     fontSize: "12px",
                     fontWeight: 500,
                     cursor: "pointer",
                     textTransform: "capitalize",
+                    transition: "var(--transition-fast)",
                   }}
                 >
                   {s}
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: "11px", color: "#6b6b6b", marginTop: "4px" }}>
+            <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginTop: "4px" }}>
               {scope === "user" ? "~/.claude/claude_desktop_config.json" : "./.mcp.json"}
             </div>
           </div>
@@ -287,7 +293,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
             <>
               {/* Command */}
               <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
                   Command *
                 </label>
                 <input
@@ -299,10 +305,10 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
                   style={{
                     width: "100%",
                     padding: "8px",
-                    borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#264653",
-                    color: "#e8e8e8",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--color-border-default)",
+                    backgroundColor: "var(--color-bg-overlay)",
+                    color: "var(--color-text-primary)",
                     fontSize: "13px",
                     fontFamily: "monospace",
                   }}
@@ -311,7 +317,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
 
               {/* Args */}
               <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
                   Arguments
                 </label>
                 <input
@@ -322,10 +328,10 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
                   style={{
                     width: "100%",
                     padding: "8px",
-                    borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#264653",
-                    color: "#e8e8e8",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--color-border-default)",
+                    backgroundColor: "var(--color-bg-overlay)",
+                    color: "var(--color-text-primary)",
                     fontSize: "13px",
                     fontFamily: "monospace",
                   }}
@@ -336,7 +342,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
             <>
               {/* URL */}
               <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
                   URL *
                 </label>
                 <input
@@ -348,10 +354,10 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
                   style={{
                     width: "100%",
                     padding: "8px",
-                    borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#264653",
-                    color: "#e8e8e8",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--color-border-default)",
+                    backgroundColor: "var(--color-bg-overlay)",
+                    color: "var(--color-text-primary)",
                     fontSize: "13px",
                     fontFamily: "monospace",
                   }}
@@ -360,7 +366,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
 
               {/* Headers */}
               <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+                <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
                   Headers
                 </label>
                 <textarea
@@ -371,16 +377,16 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
                   style={{
                     width: "100%",
                     padding: "8px",
-                    borderRadius: "4px",
-                    border: "1px solid #2a9d8f",
-                    backgroundColor: "#264653",
-                    color: "#e8e8e8",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--color-border-default)",
+                    backgroundColor: "var(--color-bg-overlay)",
+                    color: "var(--color-text-primary)",
                     fontSize: "12px",
                     fontFamily: "monospace",
                     resize: "vertical",
                   }}
                 />
-                <div style={{ fontSize: "11px", color: "#6b6b6b", marginTop: "4px" }}>
+                <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginTop: "4px" }}>
                   One header per line (Key: Value)
                 </div>
               </div>
@@ -389,7 +395,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
 
           {/* Environment Variables */}
           <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "#a0a0a0" }}>
+            <label style={{ display: "block", fontSize: "12px", marginBottom: "6px", color: "var(--color-text-secondary)" }}>
               Environment Variables
             </label>
             <textarea
@@ -400,16 +406,16 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
               style={{
                 width: "100%",
                 padding: "8px",
-                borderRadius: "4px",
-                border: "1px solid #2a9d8f",
-                backgroundColor: "#264653",
-                color: "#e8e8e8",
+                borderRadius: "var(--radius-sm)",
+                border: "1px solid var(--color-border-default)",
+                backgroundColor: "var(--color-bg-overlay)",
+                color: "var(--color-text-primary)",
                 fontSize: "12px",
                 fontFamily: "monospace",
                 resize: "vertical",
               }}
             />
-            <div style={{ fontSize: "11px", color: "#6b6b6b", marginTop: "4px" }}>
+            <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginTop: "4px" }}>
               One variable per line (KEY=value)
             </div>
           </div>
@@ -437,7 +443,7 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
         {/* Footer */}
         <div style={{
           padding: "16px",
-          borderTop: "1px solid #2a9d8f",
+          borderTop: "1px solid var(--color-border-default)",
           display: "flex",
           gap: "8px",
           justifyContent: "flex-end",
@@ -447,14 +453,17 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
             onClick={onClose}
             style={{
               padding: "8px 16px",
-              borderRadius: "4px",
-              border: "1px solid #4b5563",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--color-border-default)",
               backgroundColor: "transparent",
-              color: "#a0a0a0",
+              color: "var(--color-text-secondary)",
               fontSize: "13px",
               fontWeight: 500,
               cursor: "pointer",
+              transition: "var(--transition-fast)",
             }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "var(--color-bg-overlay)"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
           >
             Cancel
           </button>
@@ -463,14 +472,17 @@ export function MCPAddModal({ onClose }: MCPAddModalProps) {
             disabled={saving}
             style={{
               padding: "8px 16px",
-              borderRadius: "4px",
-              border: "none",
-              backgroundColor: saving ? "#6b6b6b" : "#2a9d8f",
-              color: "#fff",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--color-accent)",
+              backgroundColor: saving ? "var(--color-bg-overlay)" : "transparent",
+              color: saving ? "var(--color-text-muted)" : "var(--color-accent)",
               fontSize: "13px",
               fontWeight: 500,
               cursor: saving ? "not-allowed" : "pointer",
+              transition: "var(--transition-fast)",
             }}
+            onMouseOver={(e) => !saving && (e.currentTarget.style.backgroundColor = "rgba(130, 230, 190, 0.1)")}
+            onMouseOut={(e) => !saving && (e.currentTarget.style.backgroundColor = "transparent")}
           >
             {saving ? "Adding..." : "Add Server"}
           </button>

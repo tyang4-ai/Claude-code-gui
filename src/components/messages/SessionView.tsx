@@ -10,16 +10,17 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Session, ContentBlock, ToolUseContent } from "../../core/types";
 import { MessageList } from "./MessageList";
-import { InputArea } from "../input/InputArea";
+import { InputArea, type InputAreaHandle } from "../input/InputArea";
 import { getCLIBridge } from "../../core/cli-bridge";
 import { useStore } from "../../core/store";
 import { getSkillsManager } from "../../modules/skills";
 
 interface SessionViewProps {
   session: Session;
+  inputRef?: React.RefObject<InputAreaHandle | null>;
 }
 
-export function SessionView({ session }: SessionViewProps) {
+export function SessionView({ session, inputRef }: SessionViewProps) {
   const [activatedSkills, setActivatedSkills] = useState<string[]>([]);
 
   const appendToTranscript = useStore((state) => state.appendToTranscript);
@@ -244,6 +245,7 @@ export function SessionView({ session }: SessionViewProps) {
         )}
 
         <InputArea
+          ref={inputRef}
           onSubmit={handleSubmit}
           disabled={session.status === "thinking"}
           workingDir={session.working_dir}

@@ -67,9 +67,14 @@ function GlobGrepCardComponent({
 
   return (
     <div
-      className="tool-card glob-grep-card border border-default rounded-lg overflow-hidden"
+      className="tool-card glob-grep-card border border-default rounded-xl overflow-hidden relative"
       data-testid={`${toolName.toLowerCase()}-card`}
     >
+      {/* Colored left accent border */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg"
+        style={{ backgroundColor: 'var(--color-tool-search)' }}
+      />
       {/* Header */}
       <div
         className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
@@ -84,7 +89,8 @@ function GlobGrepCardComponent({
         <div className="flex items-center gap-2 min-w-0">
           {/* Search icon */}
           <svg
-            className="w-4 h-4 text-purple-400 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0"
+            style={{ color: 'var(--color-tool-search)' }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -98,7 +104,7 @@ function GlobGrepCardComponent({
           </svg>
 
           {/* Tool name and pattern */}
-          <span className="text-sm font-medium text-primary">{toolName}</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-tool-search)' }}>{toolName}</span>
           <code className="text-xs text-secondary font-mono truncate max-w-md">
             {pattern}
           </code>

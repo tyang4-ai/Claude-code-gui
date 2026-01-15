@@ -55,9 +55,14 @@ function ReadCardComponent({
 
   return (
     <div
-      className="tool-card read-card border border-default rounded-lg overflow-hidden"
+      className="tool-card read-card border border-default rounded-xl overflow-hidden relative"
       data-testid="read-card"
     >
+      {/* Colored left accent border */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg"
+        style={{ backgroundColor: 'var(--color-tool-read)' }}
+      />
       {/* Header */}
       <div
         className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
@@ -72,7 +77,8 @@ function ReadCardComponent({
         <div className="flex items-center gap-2 min-w-0">
           {/* File icon */}
           <svg
-            className="w-4 h-4 text-blue-400 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0"
+            style={{ color: 'var(--color-tool-read)' }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -86,7 +92,7 @@ function ReadCardComponent({
           </svg>
 
           {/* Tool name and file path */}
-          <span className="text-sm font-medium text-primary">Read</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-tool-read)' }}>Read</span>
           <span className="text-xs text-secondary font-mono truncate">
             {filePath}
           </span>

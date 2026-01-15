@@ -18,6 +18,7 @@ import { TabBar } from "./TabBar";
 import { Sidebar } from "./Sidebar";
 import { StatusBar } from "./StatusBar";
 import { SessionView } from "../messages/SessionView";
+import { type InputAreaHandle } from "../input/InputArea";
 import { WelcomeView } from "./WelcomeView";
 import { CommandPalette } from "./CommandPalette";
 import { SessionBrowser } from "./SessionBrowser";
@@ -79,8 +80,8 @@ export function AppShell() {
   // Ref to track if new session dialog is already open
   const isCreatingSessionRef = useRef(false);
 
-  // Ref to store the input insertion callback
-  const insertTemplateRef = useRef<((content: string) => void) | null>(null);
+  // Ref to InputArea for template insertion
+  const inputAreaRef = useRef<InputAreaHandle>(null);
 
   // Register commands on mount
   useEffect(() => {
@@ -351,9 +352,8 @@ export function AppShell() {
 
   // Handle template insertion
   const handleInsertTemplate = useCallback((content: string) => {
-    if (insertTemplateRef.current) {
-      insertTemplateRef.current(content);
-    }
+    inputAreaRef.current?.insertText(content);
+    setTemplatesBrowserOpen(false);
   }, []);
 
   // Check for crashed sessions on startup
@@ -442,7 +442,7 @@ export function AppShell() {
         {/* Session Content */}
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {activeSession ? (
-            <SessionView session={activeSession} />
+            <SessionView session={activeSession} inputRef={inputAreaRef} />
           ) : (
             <WelcomeView />
           )}

@@ -35,6 +35,8 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [hoveredTabId, setHoveredTabId] = useState<string | null>(null);
+  const [newTabHovered, setNewTabHovered] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({
     visible: false,
     x: 0,
@@ -230,30 +232,44 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
         </svg>
       </button>
 
-      {sessions.map((session) => (
+      {sessions.map((session) => {
+        const isActive = session.id === activeSession?.id;
+        const isHovered = hoveredTabId === session.id;
+
+        return (
         <div
           key={session.id}
           role="tab"
-          aria-selected={session.id === activeSession?.id}
+          aria-selected={isActive}
           tabIndex={0}
           title={session.working_dir}
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '6px 12px',
-            borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
+            padding: '6px 16px',
+            borderRadius: 'var(--radius-lg)',
             cursor: 'pointer',
-            fontSize: 'var(--text-base)',
-            backgroundColor: session.id === activeSession?.id ? 'var(--color-bg-elevated)' : 'transparent',
-            color: session.id === activeSession?.id ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-            borderBottom: session.id === activeSession?.id ? '2px solid var(--color-accent)' : '2px solid transparent',
-            boxShadow: session.id === activeSession?.id ? 'var(--shadow-sm)' : 'none',
-            transition: 'all var(--transition-base)'
+            fontSize: 'var(--text-sm)',
+            backgroundColor: isActive
+              ? 'rgba(88, 166, 255, 0.15)'
+              : isHovered
+                ? 'rgba(139, 148, 158, 0.3)'
+                : 'transparent',
+            color: isActive
+              ? 'var(--color-accent-primary)'
+              : isHovered
+                ? 'var(--color-text-primary)'
+                : 'var(--color-text-secondary)',
+            fontWeight: isActive ? 500 : 400,
+            boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
+            transition: 'all 0.2s ease'
           }}
           onClick={() => setActiveSession(session.id)}
           onDoubleClick={() => startEditing(session)}
           onContextMenu={(e) => handleContextMenu(e, session.id)}
+          onMouseEnter={() => setHoveredTabId(session.id)}
+          onMouseLeave={() => setHoveredTabId(null)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               setActiveSession(session.id);
@@ -317,25 +333,25 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
             </span>
           )}
 
-          {/* Close button */}
+          {/* Close button - hover reveal */}
           <button
             style={{
               marginLeft: '4px',
-              padding: '2px',
+              padding: '4px',
               borderRadius: 'var(--radius-sm)',
-              background: 'none',
+              background: 'transparent',
               border: 'none',
               cursor: 'pointer',
               color: 'inherit',
-              opacity: 0.7,
-              transition: 'opacity var(--transition-fast)'
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.15s ease, background-color 0.15s ease'
             }}
             onClick={(e) => {
               e.stopPropagation();
               handleCloseSession(session.id);
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
             aria-label="Close tab"
             data-testid="close-tab-button"
           >
@@ -354,7 +370,8 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
             </svg>
           </button>
         </div>
-      ))}
+        );
+      })}
 
       {/* New session button */}
       <button
@@ -362,17 +379,19 @@ export function TabBar({ sessions, activeSession }: TabBarProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: '32px',
-          height: '32px',
-          borderRadius: 'var(--radius-sm)',
-          background: 'none',
+          width: '36px',
+          height: '36px',
+          borderRadius: 'var(--radius-lg)',
+          background: newTabHovered ? 'rgba(88, 166, 255, 0.1)' : 'transparent',
           border: 'none',
           cursor: isCreating ? 'not-allowed' : 'pointer',
           opacity: isCreating ? 0.5 : 1,
-          color: 'var(--color-text-primary)',
-          transition: 'color var(--transition-fast)'
+          color: newTabHovered ? 'var(--color-accent-primary)' : 'var(--color-text-secondary)',
+          transition: 'all 0.2s ease'
         }}
         onClick={handleNewSession}
+        onMouseEnter={() => setNewTabHovered(true)}
+        onMouseLeave={() => setNewTabHovered(false)}
         disabled={isCreating}
         aria-label={isCreating ? "Creating session..." : "New session"}
         data-testid="new-session-button"

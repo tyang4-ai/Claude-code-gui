@@ -70,11 +70,17 @@ function BashCardComponent({
 
   return (
     <div
-      className={`tool-card bash-card border rounded-lg overflow-hidden ${
+      className={`tool-card bash-card relative border rounded-xl overflow-hidden ${
         isError ? "border-red-500/50" : "border-default"
       }`}
       data-testid="bash-card"
     >
+      {/* Colored left accent border */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg"
+        style={{ backgroundColor: 'var(--color-tool-bash)' }}
+      />
+
       {/* Header */}
       <div
         className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
@@ -89,9 +95,8 @@ function BashCardComponent({
         <div className="flex items-center gap-2 min-w-0">
           {/* Terminal icon */}
           <svg
-            className={`w-4 h-4 flex-shrink-0 ${
-              isError ? "text-red-400" : "text-green-400"
-            }`}
+            className="w-4 h-4 flex-shrink-0"
+            style={{ color: isError ? 'var(--color-error)' : 'var(--color-tool-bash)' }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -105,7 +110,7 @@ function BashCardComponent({
           </svg>
 
           {/* Tool name */}
-          <span className="text-sm font-medium text-primary">Bash</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-tool-bash)' }}>Bash</span>
 
           {/* Command preview */}
           <code className="text-xs text-secondary font-mono truncate max-w-md">

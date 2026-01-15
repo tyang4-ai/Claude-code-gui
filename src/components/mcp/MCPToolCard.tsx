@@ -28,9 +28,9 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
       style={{
         margin: "8px 0",
         padding: "12px",
-        backgroundColor: "#264653",
-        borderRadius: "8px",
-        borderLeft: `4px solid ${isError ? "#e74c3c" : "#3498db"}`,
+        backgroundColor: "var(--color-bg-overlay)",
+        borderRadius: "var(--radius-md)",
+        borderLeft: `4px solid ${isError ? "var(--color-error)" : "var(--color-info)"}`,
       }}
     >
       {/* Header */}
@@ -49,8 +49,8 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
             style={{
               width: "32px",
               height: "32px",
-              borderRadius: "6px",
-              backgroundColor: "#3498db",
+              borderRadius: "var(--radius-md)",
+              backgroundColor: "var(--color-info)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -77,7 +77,7 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
             <div style={{
               fontSize: "13px",
               fontWeight: 500,
-              color: "#e8e8e8",
+              color: "var(--color-text-primary)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -86,7 +86,7 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
             </div>
             <div style={{
               fontSize: "11px",
-              color: "#a0a0a0",
+              color: "var(--color-text-secondary)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -95,7 +95,7 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
               {hasResult && (
                 <>
                   {" • "}
-                  <span style={{ color: isError ? "#e74c3c" : "#2a9d8f" }}>
+                  <span style={{ color: isError ? "var(--color-error)" : "var(--color-success)" }}>
                     {isError ? "Error" : "Success"}
                   </span>
                 </>
@@ -103,7 +103,7 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
               {!hasResult && (
                 <>
                   {" • "}
-                  <span style={{ color: "#f39c12" }}>Running...</span>
+                  <span style={{ color: "var(--color-warning)" }}>Running...</span>
                 </>
               )}
             </div>
@@ -116,8 +116,8 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
             width: "16px",
             height: "16px",
             transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-            transition: "transform 0.2s",
-            color: "#a0a0a0",
+            transition: "transform var(--transition-fast)",
+            color: "var(--color-text-secondary)",
             flexShrink: 0,
           }}
           fill="none"
@@ -141,7 +141,7 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
             <div style={{
               fontSize: "11px",
               fontWeight: 600,
-              color: "#a0a0a0",
+              color: "var(--color-text-secondary)",
               marginBottom: "6px",
               textTransform: "uppercase",
               letterSpacing: "0.05em",
@@ -151,13 +151,13 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
             <pre
               style={{
                 padding: "8px",
-                backgroundColor: "#1d3d47",
-                borderRadius: "4px",
+                backgroundColor: "var(--color-bg-surface)",
+                borderRadius: "var(--radius-sm)",
                 fontSize: "11px",
                 fontFamily: "monospace",
                 overflow: "auto",
                 margin: 0,
-                color: "#e8e8e8",
+                color: "var(--color-text-primary)",
               }}
             >
               {JSON.stringify(invocation.input, null, 2)}
@@ -170,7 +170,7 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
               <div style={{
                 fontSize: "11px",
                 fontWeight: 600,
-                color: "#a0a0a0",
+                color: "var(--color-text-secondary)",
                 marginBottom: "6px",
                 textTransform: "uppercase",
                 letterSpacing: "0.05em",
@@ -180,13 +180,13 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
               <pre
                 style={{
                   padding: "8px",
-                  backgroundColor: isError ? "rgba(231, 76, 60, 0.1)" : "#1d3d47",
-                  borderRadius: "4px",
+                  backgroundColor: isError ? "rgba(248, 81, 73, 0.1)" : "var(--color-bg-surface)",
+                  borderRadius: "var(--radius-sm)",
                   fontSize: "11px",
                   fontFamily: "monospace",
                   overflow: "auto",
                   margin: 0,
-                  color: isError ? "#e74c3c" : "#e8e8e8",
+                  color: isError ? "var(--color-error)" : "var(--color-text-primary)",
                 }}
               >
                 {typeof result.content === "string"
@@ -200,7 +200,7 @@ export function MCPToolCard({ invocation, result }: MCPToolCardProps) {
           <div style={{
             marginTop: "8px",
             fontSize: "10px",
-            color: "#6b6b6b",
+            color: "var(--color-text-muted)",
             textAlign: "right",
           }}>
             {new Date(invocation.timestamp).toLocaleString()}

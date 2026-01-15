@@ -180,7 +180,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           backgroundColor: "var(--glass-bg)",
           backdropFilter: "blur(var(--glass-blur))",
           WebkitBackdropFilter: "blur(var(--glass-blur))",
-          borderRadius: "var(--radius-lg)",
+          borderRadius: "12px", /* rounded-xl */
           border: "1px solid rgba(255, 255, 255, 0.08)",
           boxShadow: "var(--shadow-xl)",
           zIndex: 1001,
@@ -192,8 +192,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Search Input */}
         <div
           style={{
-            padding: "16px",
+            padding: "12px 16px",
             borderBottom: "1px solid var(--color-border-muted)",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
           }}
         >
           <input
@@ -201,27 +204,44 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type a command or search..."
+            placeholder="Search commands..."
             style={{
-              width: "100%",
-              padding: "12px 16px",
-              fontSize: "var(--text-lg)",
-              backgroundColor: "var(--color-bg-base)",
-              border: "1px solid var(--color-border-default)",
-              borderRadius: "var(--radius-md)",
+              flex: 1,
+              padding: "8px 0",
+              fontSize: "var(--text-base)",
+              backgroundColor: "transparent",
+              border: "none",
               color: "var(--color-text-primary)",
               outline: "none",
-              transition: "border-color var(--transition-fast), box-shadow var(--transition-fast)",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = "var(--color-accent)";
-              e.target.style.boxShadow = "var(--shadow-glow)";
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = "var(--color-border-default)";
-              e.target.style.boxShadow = "none";
             }}
           />
+          <button
+            onClick={onClose}
+            style={{
+              padding: "4px",
+              borderRadius: "var(--radius-sm)",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--color-text-secondary)",
+              transition: "background-color var(--transition-fast)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--color-bg-overlay)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
         {/* Results List */}
@@ -248,21 +268,6 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             </div>
           )}
 
-          {results.length > 0 && !query && (
-            <div
-              style={{
-                padding: "8px 16px",
-                fontSize: "var(--text-xs)",
-                fontWeight: "var(--font-semibold)",
-                color: "var(--color-text-secondary)",
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-              }}
-            >
-              Recent Commands
-            </div>
-          )}
-
           {results.map((result, index) => (
             <CommandItem
               key={result.command.id}
@@ -278,23 +283,30 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         {/* Footer */}
         <div
           style={{
-            padding: "12px 16px",
+            padding: "8px 16px",
             borderTop: "1px solid var(--color-border-muted)",
             display: "flex",
-            gap: "16px",
+            alignItems: "center",
+            justifyContent: "space-between",
             fontSize: "var(--text-xs)",
             color: "var(--color-text-secondary)",
+            backgroundColor: "rgba(0, 0, 0, 0.2)",
           }}
         >
-          <div>
-            <kbd style={kbdStyle}>↑</kbd> <kbd style={kbdStyle}>↓</kbd> Navigate
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <kbd style={kbdStyle}>↑↓</kbd>
+              navigate
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <kbd style={kbdStyle}>↵</kbd>
+              select
+            </span>
           </div>
-          <div>
-            <kbd style={kbdStyle}>Enter</kbd> Execute
-          </div>
-          <div>
-            <kbd style={kbdStyle}>Esc</kbd> Close
-          </div>
+          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <kbd style={kbdStyle}>esc</kbd>
+            close
+          </span>
         </div>
       </div>
 
@@ -351,11 +363,12 @@ function CommandItem({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       style={{
-        padding: "12px 16px",
+        padding: "8px 12px",
+        margin: "0 8px",
+        borderRadius: "var(--radius-md)",
         cursor: "pointer",
         backgroundColor: isSelected ? "var(--color-bg-overlay)" : "transparent",
-        borderLeft: isSelected ? "3px solid var(--color-accent)" : "3px solid transparent",
-        transition: "all var(--transition-fast)",
+        transition: "background-color var(--transition-fast)",
       }}
     >
       <div
@@ -413,43 +426,22 @@ function CommandItem({
           </div>
         </div>
 
-        {/* Right: Category + Shortcut */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexShrink: 0,
-          }}
-        >
-          {/* Category badge */}
-          <div
+        {/* Right: Shortcut */}
+        {command.shortcut && (
+          <kbd
             style={{
-              fontSize: "10px",
               padding: "2px 8px",
               borderRadius: "var(--radius-sm)",
-              backgroundColor: getCategoryColor(command.category),
-              color: "#fff",
-              fontWeight: "var(--font-semibold)",
-              textTransform: "uppercase",
-              letterSpacing: "0.3px",
+              backgroundColor: "var(--color-bg-base)",
+              fontSize: "10px",
+              fontFamily: "monospace",
+              color: "var(--color-text-secondary)",
+              flexShrink: 0,
             }}
           >
-            {command.category}
-          </div>
-
-          {/* Keyboard shortcut */}
-          {command.shortcut && (
-            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
-              {command.shortcut.split("+").map((key, i, arr) => (
-                <span key={i}>
-                  <kbd style={kbdStyle}>{key}</kbd>
-                  {i < arr.length - 1 && <span style={{ margin: "0 2px" }}>+</span>}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+            {command.shortcut}
+          </kbd>
+        )}
       </div>
     </div>
   );
@@ -470,19 +462,3 @@ const kbdStyle: React.CSSProperties = {
   fontWeight: 600,
 };
 
-/**
- * Get color for command category badge
- */
-function getCategoryColor(category: string): string {
-  const colors: Record<string, string> = {
-    session: "#f85149",    // Error red
-    navigation: "#58a6ff", // Accent blue
-    settings: "#d29922",   // Warning amber
-    skill: "#a371f7",      // Purple
-    file: "#58a6ff",       // Accent blue
-    action: "#3fb950",     // Success green
-    help: "#8b949e",       // Secondary gray
-  };
-
-  return colors[category] || "#6c757d";
-}

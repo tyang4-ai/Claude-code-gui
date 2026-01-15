@@ -265,3 +265,23 @@ When making changes:
 3. Test with `npm run tauri dev`
 4. Update this CLAUDE.md if adding new features
 5. See `docs/USER_MANUAL.md` for feature documentation
+
+---
+
+## Session Management
+
+**IMPORTANT:** After completing each fix or development phase:
+
+1. **Update `SESSION.md`** in project root with:
+   - Current date
+   - Task completion status
+   - Notes for next session
+
+2. **Keep it current** - SESSION.md is the single source of truth for:
+   - What's working
+   - What's in progress
+   - What's next
+
+3. **Archive details** - Move verbose notes to `docs/session-notes/` to keep SESSION.md scannable
+
+This ensures continuity between Claude Code sessions.

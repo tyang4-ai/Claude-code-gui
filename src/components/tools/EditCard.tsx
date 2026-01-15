@@ -111,7 +111,7 @@ function EditCardComponent({
 
   return (
     <div
-      className={`tool-card edit-card border rounded-lg overflow-hidden relative ${
+      className={`tool-card edit-card border rounded-xl overflow-hidden relative ${
         isPending
           ? "border-amber-500/50"
           : applyResult?.type === "success"
@@ -122,6 +122,12 @@ function EditCardComponent({
       }`}
       data-testid="edit-card"
     >
+      {/* Colored left accent border */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg"
+        style={{ backgroundColor: 'var(--color-tool-edit)' }}
+      />
+
       {/* Header */}
       <div
         className="flex items-center justify-between px-3 py-2 border-b cursor-pointer"
@@ -137,7 +143,8 @@ function EditCardComponent({
         <div className="flex items-center gap-2 min-w-0">
           {/* Edit icon */}
           <svg
-            className="w-4 h-4 text-amber-400 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0"
+            style={{ color: 'var(--color-tool-edit)' }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -151,7 +158,7 @@ function EditCardComponent({
           </svg>
 
           {/* Tool name and file path */}
-          <span className="text-sm font-medium text-primary">Edit</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-tool-edit)' }}>Edit</span>
           <span className="text-xs text-secondary font-mono truncate">
             {filePath}
           </span>

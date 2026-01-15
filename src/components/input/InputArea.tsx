@@ -7,6 +7,8 @@ import {
   useRef,
   useCallback,
   useEffect,
+  forwardRef,
+  useImperativeHandle,
   type KeyboardEvent,
 } from "react";
 import { getFileIndex } from "../../core/file-index";
@@ -19,19 +21,30 @@ interface FileEntry {
   isDirectory: boolean;
 }
 
+export interface InputAreaHandle {
+  insertText: (text: string) => void;
+  focus: () => void;
+}
+
 interface InputAreaProps {
   onSubmit: (prompt: string) => void;
   disabled?: boolean;
   placeholder?: string;
   workingDir?: string;
+  onOpenCommandPalette?: () => void;
 }
 
-export function InputArea({
-  onSubmit,
-  disabled = false,
-  placeholder = "Type a message... (Ctrl+Enter to send)",
-  workingDir = "",
-}: InputAreaProps) {
+export const InputArea = forwardRef<InputAreaHandle, InputAreaProps>(
+  function InputArea(
+    {
+      onSubmit,
+      disabled = false,
+      placeholder = "Type a message... (Ctrl+Enter to send)",
+      workingDir = "",
+      onOpenCommandPalette,
+    },
+    ref
+  ) {
   const [value, setValue] = useState("");
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [autocompleteQuery, setAutocompleteQuery] = useState("");
@@ -46,6 +59,17 @@ export function InputArea({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const autocompleteRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    insertText: (text: string) => {
+      setValue(prev => prev + text);
+      textareaRef.current?.focus();
+    },
+    focus: () => {
+      textareaRef.current?.focus();
+    }
+  }), []);
 
   // Initialize file index when working directory changes
   useEffect(() => {
@@ -440,15 +464,104 @@ export function InputArea({
           </button>
         </div>
 
-        {/* Keyboard shortcut hint */}
-        <div style={{ marginTop: '8px', fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textAlign: 'right' }}>
-          Press{" "}
-          <kbd style={{ padding: '2px 6px', backgroundColor: 'var(--color-bg-overlay)', borderRadius: 'var(--radius-sm)' }}>Ctrl+Enter</kbd>{" "}
-          to send | Type{" "}
-          <kbd style={{ padding: '2px 6px', backgroundColor: 'var(--color-bg-overlay)', borderRadius: 'var(--radius-sm)' }}>@</kbd>{" "}
-          for file autocomplete
+        {/* Keyboard hints row */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: '8px',
+          fontSize: 'var(--text-xs)',
+          color: 'var(--color-text-secondary)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <kbd style={{
+                padding: '2px 6px',
+                backgroundColor: 'var(--color-bg-overlay)',
+                borderRadius: 'var(--radius-sm)',
+                fontFamily: 'monospace',
+                fontSize: '10px'
+              }}>@</kbd>
+              <span>mention files</span>
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <kbd style={{
+                padding: '2px 6px',
+                backgroundColor: 'var(--color-bg-overlay)',
+                borderRadius: 'var(--radius-sm)',
+                fontFamily: 'monospace',
+                fontSize: '10px'
+              }}>Ctrl</kbd>
+              <span>+</span>
+              <kbd style={{
+                padding: '2px 6px',
+                backgroundColor: 'var(--color-bg-overlay)',
+                borderRadius: 'var(--radius-sm)',
+                fontFamily: 'monospace',
+                fontSize: '10px'
+              }}>P</kbd>
+              <span>commands</span>
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <kbd style={{
+                padding: '2px 6px',
+                backgroundColor: 'var(--color-bg-overlay)',
+                borderRadius: 'var(--radius-sm)',
+                fontFamily: 'monospace',
+                fontSize: '10px'
+              }}>Ctrl</kbd>
+              <span>+</span>
+              <kbd style={{
+                padding: '2px 6px',
+                backgroundColor: 'var(--color-bg-overlay)',
+                borderRadius: 'var(--radius-sm)',
+                fontFamily: 'monospace',
+                fontSize: '10px'
+              }}>Enter</kbd>
+              <span>send</span>
+            </span>
+          </div>
+          <button
+            onClick={onOpenCommandPalette}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-secondary)',
+              fontSize: 'var(--text-xs)',
+              cursor: 'pointer',
+              padding: '4px 8px',
+              borderRadius: 'var(--radius-sm)',
+              transition: 'color var(--transition-fast), background-color var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-primary)';
+              e.currentTarget.style.backgroundColor = 'var(--color-bg-overlay)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-secondary)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            <svg
+              style={{ width: '12px', height: '12px' }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <span>Command Palette</span>
+          </button>
         </div>
       </div>
     </div>
   );
-}
+});

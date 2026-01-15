@@ -96,8 +96,8 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
     <div style={{
       marginTop: "4px",
       padding: "12px",
-      backgroundColor: "#1d3d47",
-      borderRadius: "6px",
+      backgroundColor: "var(--color-bg-surface)",
+      borderRadius: "var(--radius-md)",
       fontSize: "12px",
     }}>
       {/* Action Buttons */}
@@ -113,14 +113,17 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
             onClick={handleStart}
             style={{
               padding: "4px 8px",
-              borderRadius: "4px",
-              backgroundColor: "#2a9d8f",
-              border: "none",
-              color: "#fff",
+              borderRadius: "var(--radius-sm)",
+              backgroundColor: "transparent",
+              border: "1px solid var(--color-success)",
+              color: "var(--color-success)",
               fontSize: "11px",
               fontWeight: 500,
               cursor: "pointer",
+              transition: "var(--transition-fast)",
             }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "rgba(130, 230, 190, 0.1)"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
           >
             Start
           </button>
@@ -131,14 +134,17 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
             onClick={handleStop}
             style={{
               padding: "4px 8px",
-              borderRadius: "4px",
-              backgroundColor: "#e74c3c",
-              border: "none",
-              color: "#fff",
+              borderRadius: "var(--radius-sm)",
+              backgroundColor: "transparent",
+              border: "1px solid var(--color-error)",
+              color: "var(--color-error)",
               fontSize: "11px",
               fontWeight: 500,
               cursor: "pointer",
+              transition: "var(--transition-fast)",
             }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "rgba(248, 81, 73, 0.1)"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
           >
             Stop
           </button>
@@ -150,14 +156,17 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
             onClick={handleRestart}
             style={{
               padding: "4px 8px",
-              borderRadius: "4px",
-              backgroundColor: "#f39c12",
-              border: "none",
-              color: "#fff",
+              borderRadius: "var(--radius-sm)",
+              backgroundColor: "transparent",
+              border: "1px solid var(--color-warning)",
+              color: "var(--color-warning)",
               fontSize: "11px",
               fontWeight: 500,
               cursor: "pointer",
+              transition: "var(--transition-fast)",
             }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "rgba(210, 153, 34, 0.1)"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
           >
             Restart
           </button>
@@ -169,15 +178,18 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
           disabled={testing}
           style={{
             padding: "4px 8px",
-            borderRadius: "4px",
-            backgroundColor: "#3498db",
-            border: "none",
-            color: "#fff",
+            borderRadius: "var(--radius-sm)",
+            backgroundColor: "transparent",
+            border: "1px solid var(--color-info)",
+            color: "var(--color-info)",
             fontSize: "11px",
             fontWeight: 500,
             cursor: testing ? "not-allowed" : "pointer",
             opacity: testing ? 0.6 : 1,
+            transition: "var(--transition-fast)",
           }}
+          onMouseOver={(e) => !testing && (e.currentTarget.style.backgroundColor = "rgba(88, 166, 255, 0.1)")}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
         >
           {testing ? "Testing..." : "Test"}
         </button>
@@ -188,13 +200,14 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
             onClick={handleToggleEnabled}
             style={{
               padding: "4px 8px",
-              borderRadius: "4px",
-              backgroundColor: server.enabled ? "#6b6b6b" : "#2a9d8f",
-              border: "none",
-              color: "#fff",
+              borderRadius: "var(--radius-sm)",
+              backgroundColor: "transparent",
+              border: `1px solid ${server.enabled ? "var(--color-text-muted)" : "var(--color-success)"}`,
+              color: server.enabled ? "var(--color-text-muted)" : "var(--color-success)",
               fontSize: "11px",
               fontWeight: 500,
               cursor: "pointer",
+              transition: "var(--transition-fast)",
             }}
           >
             {server.enabled ? "Disable" : "Enable"}
@@ -207,15 +220,18 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
             onClick={handleRemove}
             style={{
               padding: "4px 8px",
-              borderRadius: "4px",
+              borderRadius: "var(--radius-sm)",
               backgroundColor: "transparent",
-              border: "1px solid #e74c3c",
-              color: "#e74c3c",
+              border: "1px solid var(--color-error)",
+              color: "var(--color-error)",
               fontSize: "11px",
               fontWeight: 500,
               cursor: "pointer",
               marginLeft: "auto",
+              transition: "var(--transition-fast)",
             }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "rgba(248, 81, 73, 0.1)"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
           >
             Remove
           </button>
@@ -227,9 +243,9 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
         <div style={{
           marginBottom: "12px",
           padding: "8px",
-          backgroundColor: testResult.healthy ? "rgba(42, 157, 143, 0.1)" : "rgba(231, 76, 60, 0.1)",
-          borderRadius: "4px",
-          color: testResult.healthy ? "#2a9d8f" : "#e74c3c",
+          backgroundColor: testResult.healthy ? "rgba(63, 185, 80, 0.1)" : "rgba(248, 81, 73, 0.1)",
+          borderRadius: "var(--radius-sm)",
+          color: testResult.healthy ? "var(--color-success)" : "var(--color-error)",
         }}>
           {testResult.healthy ? (
             <div>
@@ -247,7 +263,7 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
         display: "flex",
         gap: "4px",
         marginBottom: "8px",
-        borderBottom: "1px solid #2a9d8f",
+        borderBottom: "1px solid var(--color-border-default)",
       }}>
         {(["info", "tools", "resources", "prompts"] as const).map((tab) => (
           <button
@@ -257,12 +273,13 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
               padding: "6px 12px",
               border: "none",
               backgroundColor: "transparent",
-              color: activeTab === tab ? "#2a9d8f" : "#a0a0a0",
+              color: activeTab === tab ? "var(--color-accent)" : "var(--color-text-secondary)",
               fontSize: "11px",
               fontWeight: 500,
               cursor: "pointer",
-              borderBottom: activeTab === tab ? "2px solid #2a9d8f" : "none",
+              borderBottom: activeTab === tab ? "2px solid var(--color-accent)" : "none",
               textTransform: "capitalize",
+              transition: "var(--transition-fast)",
             }}
           >
             {tab}
@@ -271,7 +288,7 @@ export function MCPServerDetail({ server }: MCPServerDetailProps) {
       </div>
 
       {/* Tab Content */}
-      <div style={{ color: "#e8e8e8" }}>
+      <div style={{ color: "var(--color-text-primary)" }}>
         {activeTab === "info" && <InfoTab server={server} />}
         {activeTab === "tools" && <ToolsTab server={server} />}
         {activeTab === "resources" && <ResourcesTab server={server} />}
@@ -308,7 +325,7 @@ function InfoTab({ server }: { server: MCPServer }) {
 function InfoRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div>
-      <div style={{ color: "#a0a0a0", fontSize: "10px", marginBottom: "2px" }}>
+      <div style={{ color: "var(--color-text-secondary)", fontSize: "10px", marginBottom: "2px" }}>
         {label}
       </div>
       <div style={{
@@ -327,7 +344,7 @@ function ToolsTab({ server }: { server: MCPServer }) {
 
   if (tools.length === 0) {
     return (
-      <div style={{ padding: "12px", textAlign: "center", color: "#6b6b6b" }}>
+      <div style={{ padding: "12px", textAlign: "center", color: "var(--color-text-muted)" }}>
         No tools available
       </div>
     );
@@ -340,13 +357,13 @@ function ToolsTab({ server }: { server: MCPServer }) {
           key={tool.name}
           style={{
             padding: "8px",
-            backgroundColor: "#264653",
-            borderRadius: "4px",
+            backgroundColor: "var(--color-bg-overlay)",
+            borderRadius: "var(--radius-sm)",
           }}
         >
           <div style={{ fontWeight: 500, marginBottom: "4px" }}>{tool.name}</div>
           {tool.description && (
-            <div style={{ fontSize: "11px", color: "#a0a0a0" }}>
+            <div style={{ fontSize: "11px", color: "var(--color-text-secondary)" }}>
               {tool.description}
             </div>
           )}
@@ -361,7 +378,7 @@ function ResourcesTab({ server }: { server: MCPServer }) {
 
   if (resources.length === 0) {
     return (
-      <div style={{ padding: "12px", textAlign: "center", color: "#6b6b6b" }}>
+      <div style={{ padding: "12px", textAlign: "center", color: "var(--color-text-muted)" }}>
         No resources available
       </div>
     );
@@ -374,16 +391,16 @@ function ResourcesTab({ server }: { server: MCPServer }) {
           key={resource.uri}
           style={{
             padding: "8px",
-            backgroundColor: "#264653",
-            borderRadius: "4px",
+            backgroundColor: "var(--color-bg-overlay)",
+            borderRadius: "var(--radius-sm)",
           }}
         >
           <div style={{ fontWeight: 500, marginBottom: "4px" }}>{resource.name}</div>
-          <div style={{ fontSize: "10px", fontFamily: "monospace", color: "#a0a0a0", marginBottom: "4px" }}>
+          <div style={{ fontSize: "10px", fontFamily: "monospace", color: "var(--color-text-secondary)", marginBottom: "4px" }}>
             {resource.uri}
           </div>
           {resource.description && (
-            <div style={{ fontSize: "11px", color: "#a0a0a0" }}>
+            <div style={{ fontSize: "11px", color: "var(--color-text-secondary)" }}>
               {resource.description}
             </div>
           )}
@@ -398,7 +415,7 @@ function PromptsTab({ server }: { server: MCPServer }) {
 
   if (prompts.length === 0) {
     return (
-      <div style={{ padding: "12px", textAlign: "center", color: "#6b6b6b" }}>
+      <div style={{ padding: "12px", textAlign: "center", color: "var(--color-text-muted)" }}>
         No prompts available
       </div>
     );
@@ -411,27 +428,27 @@ function PromptsTab({ server }: { server: MCPServer }) {
           key={prompt.name}
           style={{
             padding: "8px",
-            backgroundColor: "#264653",
-            borderRadius: "4px",
+            backgroundColor: "var(--color-bg-overlay)",
+            borderRadius: "var(--radius-sm)",
           }}
         >
           <div style={{ fontWeight: 500, marginBottom: "4px" }}>{prompt.name}</div>
           {prompt.description && (
-            <div style={{ fontSize: "11px", color: "#a0a0a0", marginBottom: "6px" }}>
+            <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", marginBottom: "6px" }}>
               {prompt.description}
             </div>
           )}
           {prompt.arguments && prompt.arguments.length > 0 && (
             <div style={{ fontSize: "10px" }}>
-              <div style={{ color: "#a0a0a0", marginBottom: "4px" }}>Arguments:</div>
+              <div style={{ color: "var(--color-text-secondary)", marginBottom: "4px" }}>Arguments:</div>
               {prompt.arguments.map((arg) => (
                 <div key={arg.name} style={{ marginLeft: "8px", marginBottom: "2px" }}>
-                  <span style={{ fontFamily: "monospace", color: "#2a9d8f" }}>
+                  <span style={{ fontFamily: "monospace", color: "var(--color-accent)" }}>
                     {arg.name}
                   </span>
-                  {arg.required && <span style={{ color: "#e74c3c" }}>*</span>}
+                  {arg.required && <span style={{ color: "var(--color-error)" }}>*</span>}
                   {arg.description && (
-                    <span style={{ color: "#a0a0a0" }}> - {arg.description}</span>
+                    <span style={{ color: "var(--color-text-secondary)" }}> - {arg.description}</span>
                   )}
                 </div>
               ))}

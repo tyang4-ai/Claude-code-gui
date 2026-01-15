@@ -54,13 +54,13 @@ export function MCPPanel() {
       display: "flex",
       flexDirection: "column",
       height: "100%",
-      backgroundColor: "#1d3d47",
-      color: "#e8e8e8",
+      backgroundColor: "var(--color-bg-surface)",
+      color: "var(--color-text-primary)",
     }}>
       {/* Header */}
       <div style={{
         padding: "12px",
-        borderBottom: "1px solid #2a9d8f",
+        borderBottom: "1px solid var(--color-border-default)",
       }}>
         <div style={{
           display: "flex",
@@ -79,16 +79,17 @@ export function MCPPanel() {
             onClick={() => setShowAddModal(true)}
             style={{
               padding: "4px 8px",
-              borderRadius: "4px",
-              backgroundColor: "#2a9d8f",
-              border: "none",
-              color: "#fff",
+              borderRadius: "var(--radius-sm)",
+              backgroundColor: "transparent",
+              border: "1px solid var(--color-accent)",
+              color: "var(--color-accent)",
               fontSize: "12px",
               fontWeight: 500,
               cursor: "pointer",
+              transition: "var(--transition-fast)",
             }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#238277"}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#2a9d8f"}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "rgba(130, 230, 190, 0.1)"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
             aria-label="Add MCP server"
           >
             + Add
@@ -105,31 +106,31 @@ export function MCPPanel() {
           }}>
             <div style={{
               padding: "6px",
-              backgroundColor: "#264653",
-              borderRadius: "4px",
+              backgroundColor: "var(--color-bg-overlay)",
+              borderRadius: "var(--radius-sm)",
               textAlign: "center",
             }}>
-              <div style={{ color: "#a0a0a0", marginBottom: "2px" }}>Servers</div>
+              <div style={{ color: "var(--color-text-secondary)", marginBottom: "2px" }}>Servers</div>
               <div style={{ fontSize: "16px", fontWeight: 600 }}>{stats.totalServers}</div>
             </div>
             <div style={{
               padding: "6px",
-              backgroundColor: "#264653",
-              borderRadius: "4px",
+              backgroundColor: "var(--color-bg-overlay)",
+              borderRadius: "var(--radius-sm)",
               textAlign: "center",
             }}>
-              <div style={{ color: "#a0a0a0", marginBottom: "2px" }}>Connected</div>
-              <div style={{ fontSize: "16px", fontWeight: 600, color: "#2a9d8f" }}>
+              <div style={{ color: "var(--color-text-secondary)", marginBottom: "2px" }}>Connected</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: "var(--color-success)" }}>
                 {stats.connectedServers}
               </div>
             </div>
             <div style={{
               padding: "6px",
-              backgroundColor: "#264653",
-              borderRadius: "4px",
+              backgroundColor: "var(--color-bg-overlay)",
+              borderRadius: "var(--radius-sm)",
               textAlign: "center",
             }}>
-              <div style={{ color: "#a0a0a0", marginBottom: "2px" }}>Tools</div>
+              <div style={{ color: "var(--color-text-secondary)", marginBottom: "2px" }}>Tools</div>
               <div style={{ fontSize: "16px", fontWeight: 600 }}>{stats.totalTools}</div>
             </div>
           </div>
@@ -149,18 +150,19 @@ export function MCPPanel() {
               style={{
                 flex: 1,
                 padding: "4px 6px",
-                borderRadius: "4px",
+                borderRadius: "var(--radius-sm)",
                 border: "none",
-                backgroundColor: selectedScope === scope ? "#2a9d8f" : "transparent",
-                color: selectedScope === scope ? "#fff" : "#a0a0a0",
+                backgroundColor: selectedScope === scope ? "rgba(130, 230, 190, 0.15)" : "transparent",
+                color: selectedScope === scope ? "var(--color-accent)" : "var(--color-text-secondary)",
                 fontSize: "11px",
                 fontWeight: 500,
                 cursor: "pointer",
                 textTransform: "capitalize",
+                transition: "var(--transition-fast)",
               }}
               onMouseOver={(e) => {
                 if (selectedScope !== scope) {
-                  e.currentTarget.style.backgroundColor = "#264653";
+                  e.currentTarget.style.backgroundColor = "var(--color-bg-overlay)";
                 }
               }}
               onMouseOut={(e) => {
@@ -188,7 +190,7 @@ export function MCPPanel() {
                 <h3 style={{
                   fontSize: "11px",
                   fontWeight: 600,
-                  color: "#a0a0a0",
+                  color: "var(--color-text-secondary)",
                   textTransform: "uppercase",
                   letterSpacing: "0.05em",
                   marginBottom: "8px",
@@ -204,7 +206,7 @@ export function MCPPanel() {
                 <h3 style={{
                   fontSize: "11px",
                   fontWeight: 600,
-                  color: "#a0a0a0",
+                  color: "var(--color-text-secondary)",
                   textTransform: "uppercase",
                   letterSpacing: "0.05em",
                   marginBottom: "8px",
@@ -220,7 +222,7 @@ export function MCPPanel() {
                 <h3 style={{
                   fontSize: "11px",
                   fontWeight: 600,
-                  color: "#a0a0a0",
+                  color: "var(--color-text-secondary)",
                   textTransform: "uppercase",
                   letterSpacing: "0.05em",
                   marginBottom: "8px",
@@ -235,7 +237,7 @@ export function MCPPanel() {
               <div style={{
                 padding: "24px",
                 textAlign: "center",
-                color: "#6b6b6b",
+                color: "var(--color-text-muted)",
                 fontSize: "14px",
               }}>
                 No MCP servers configured
@@ -245,13 +247,16 @@ export function MCPPanel() {
                   style={{
                     marginTop: "12px",
                     padding: "6px 12px",
-                    borderRadius: "4px",
-                    backgroundColor: "#2a9d8f",
-                    border: "none",
-                    color: "#fff",
+                    borderRadius: "var(--radius-sm)",
+                    backgroundColor: "transparent",
+                    border: "1px solid var(--color-accent)",
+                    color: "var(--color-accent)",
                     fontSize: "12px",
                     cursor: "pointer",
+                    transition: "var(--transition-fast)",
                   }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = "rgba(130, 230, 190, 0.1)"}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                 >
                   Add Your First Server
                 </button>
@@ -265,7 +270,7 @@ export function MCPPanel() {
               <div style={{
                 padding: "24px",
                 textAlign: "center",
-                color: "#6b6b6b",
+                color: "var(--color-text-muted)",
                 fontSize: "14px",
               }}>
                 No {selectedScope} servers

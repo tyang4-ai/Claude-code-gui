@@ -5,35 +5,44 @@
    ============================================ */
 
 :root {
-  /* Base Colors - Dark Theme */
-  --color-bg-base: #0f1419;           /* Deepest background */
-  --color-bg-surface: #1a1f26;        /* Card/panel background */
-  --color-bg-elevated: #242b35;       /* Elevated surfaces (modals) */
-  --color-bg-overlay: #2d3640;        /* Hover states, active items */
+  /* Background Hierarchy - Purple-tinted dark */
+  --color-bg-base: oklch(0.14 0.015 260);
+  --color-bg-surface: oklch(0.18 0.015 260);
+  --color-bg-elevated: oklch(0.21 0.015 260);
+  --color-bg-overlay: oklch(0.24 0.015 260);
 
   /* Text Colors */
-  --color-text-primary: #e6edf3;      /* Primary text */
-  --color-text-secondary: #8b949e;    /* Secondary text */
-  --color-text-muted: #484f58;        /* Muted/disabled text */
+  --color-text-primary: oklch(0.97 0 0);
+  --color-text-secondary: oklch(0.65 0.02 260);
+  --color-text-muted: oklch(0.5 0.02 260);
 
   /* Legacy aliases for compatibility */
   --color-text-default: var(--color-text-primary);
   --color-text-dim: var(--color-text-secondary);
   --color-text-faint: var(--color-text-muted);
 
-  /* Accent Colors */
-  --color-accent: #58a6ff;            /* Primary accent (blue) */
-  --color-accent-primary: #58a6ff;
-  --color-accent-alt: #a371f7;        /* Secondary accent (purple) */
-  --color-success: #3fb950;           /* Success green */
-  --color-warning: #d29922;           /* Warning amber */
-  --color-error: #f85149;             /* Error red */
+  /* Primary - Mint Green */
+  --color-accent: oklch(0.82 0.16 165);
+  --color-accent-primary: oklch(0.82 0.16 165);
+  --color-accent-alt: oklch(0.75 0.12 280);
 
-  /* Border Colors */
-  --color-border: #30363d;            /* Default borders */
-  --color-border-default: #30363d;
-  --color-border-muted: #21262d;      /* Subtle borders */
-  --color-border-accent: rgba(88, 166, 255, 0.4);
+  /* Status Colors - Vivid Pastels */
+  --color-success: oklch(0.82 0.18 150);
+  --color-warning: oklch(0.88 0.14 75);
+  --color-error: oklch(0.75 0.16 25);
+  --color-info: oklch(0.8 0.14 240);
+
+  /* Tool Card Accent Colors */
+  --color-tool-bash: oklch(0.78 0.14 240);
+  --color-tool-edit: oklch(0.82 0.15 55);
+  --color-tool-read: oklch(0.8 0.12 280);
+  --color-tool-search: oklch(0.82 0.16 150);
+
+  /* Borders */
+  --color-border: oklch(0.32 0.02 260);
+  --color-border-default: oklch(0.32 0.02 260);
+  --color-border-muted: oklch(0.25 0.015 260);
+  --color-border-accent: oklch(0.82 0.16 165 / 0.4);
 
   /* Shadow System */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
